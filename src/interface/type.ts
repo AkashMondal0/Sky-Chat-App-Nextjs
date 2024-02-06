@@ -1,149 +1,135 @@
-export type search_data_user = {
-    id: string;
-    name: string;
-    email: string;
-    imageUrl?: string;
+
+export interface File {
+    url: string;
+    type: 'image' | 'video' | 'audio' | 'file';
+    caption?:string
 }
 
-export type Notification = {
-    id: string;
-    userId: string;
-    user: User;
-    title: string;
-    body: string;
-    read: boolean;
-    createdAt: Date;
-    updatedAt: Date;
-  }
-
-  export type UserHistory = {
-    id: string;
-    searchUsers: User[];
-  }
-  
-  export type User = {
-    id: string;
-    name: string;
-    imageUrl: string;
-    email: string;
-    phone: string;
-    status: string;
-    cloudMessageId: string;
-    notification: Notification[];
-    conversations: Conversation[];
-    userHistory: UserHistory[];
-    groups: Group[];
-    createdAt: Date;
-    updatedAt: Date;
-  }
-  
-  export type Conversation = {
-    id: string;
-    users: User[];
-    createdAt: Date;
-    updatedAt: Date;
-    lastMessage: string;
-    lastMessageTime: Date;
-    messages: MessageDirect[];
-    type:"DIRECT" | "GROUP";
-  }
-  
-  export type SeenBy = {
-    id: string;
-    user: User;
-    userId: string;
-    message: MessageDirect;
-    messageId: string;
-    createdAt: Date;
-    updatedAt: Date;
-  }
-  
-  export type MessageDirect = {
-    id?: string;
+export interface PrivateMessage {
+    _id?: string;
+    memberDetails?: User;
     content: string;
-    fileUrl?: string;
+    fileUrl?: File[] | null;
+    memberId: string;
+    senderId: string;
+    receiverId: string;
     conversationId: string;
-    memberId: string;
-    deleted?: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
-    seenBy?: SeenBy[];
-  }
-  
-  export type Group = {
-    id: string;
-    name: string;
-    imageUrl: string;
-    Members: Member[];
-    users: User[];
-    createdAt: Date;
-    updatedAt: Date;
-    lastMessage: string;
-    lastMessageTime: Date;
-    messages: GroupMessage[];
-    author?: User;
-    authorId?: string;
-    type:"DIRECT" | "GROUP";
-  }
-  
-  enum MemberRole {
-    ADMIN = "ADMIN",
-    COADMIN = "COADMIN",
-    MEMBER = "MEMBER",
-  }
-  
-  export type Member = {
-    id: string;
-    role: MemberRole;
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
-    groupId: string;
-    group: Group;
-  }
-  
-  export type GroupSeenBy = {
-    id?: string;
-    userId: string;
-    messageId?: string;
-    message?: GroupMessage;
-    createdAt?: Date;
-    updatedAt?: Date;
-    MessageDirect?: MessageDirect;
-    messageDirectId?: string;
-    User?: User;
-  }
-  
-  export type GroupMessage = {
-    id?: string;
-    content: string;
-    fileUrl?: string;
-    memberId: string;
-    groupId: string;
-    group?: Group;
-    deleted?: boolean;
-    seenBy?: GroupSeenBy[];
-    createdAt?: Date;
-    updatedAt?: Date;
-  }
-
-  export type typingState = {
-    conversationId?: string,
-    groupId?: string,
-    senderId?: string,
-    receiverId?: string,
-    typing: boolean
+    deleted: boolean;
+    seenBy: [User['_id']];
+    deliveredTo?: [User['_id']];
+    createdAt: string | Date | any;
+    updatedAt: string | Date | any;
+    replyTo?: {
+        _id: string;
+        content: string;
+        memberId: string;
+        conversationId: string;
+        deleted: boolean;
+        replyContent: PrivateMessage;
+    };
+    typeDate?: Boolean;
 }
 
-export type login_credential = {
-    email: string;
-    password: string;
+export interface PrivateChat {
+    _id?: string;
+    users?: [
+        User['_id'],
+    ];
+    userDetails?: User;
+    lastMessageContent: string;
+    messages?: PrivateMessage[];
+    updatedAt?: string | Date;
+    createdAt?: string | Date;
+    typing?: boolean;
+    loadAllMessages?: boolean | undefined;
+    page?: number | undefined;
 }
 
-export type register_credential = {
-    name: string;
+export interface PrivateMessageSeen {
+    messageIds: string[];
+    memberId: string;
+    receiverId: string;
+    conversationId: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface typingState {
+    conversationId: string;
+    senderId: string;
+    receiverId: string;
+    typing: boolean;
+
+}
+
+export interface User {
+    _id: string;
+    username: string;
     email: string;
     password: string;
-    phone?: string;
-    imageUrl?: string;
+    profilePicture?: string;
+    coverPicture?: string;
+    followers?: string[];
+    followings?: string[];
+    privateIds?: string[];
+    groupIds?: string[];
+    bio?: string;
+    city?: string;
+    from?: string;
+    updatedAt?: string;
+    createdAt?: string;
+    themes?: CurrentTheme[]
+    status?: Status[];
+    isOnline?: boolean;
+}
+
+export interface Status {
+    _id: string,
+    url: string,
+    type: 'image' | 'video' | 'audio' | "text"
+    forText?: string;
+    forTextBackground?: boolean;
+    forTextColor?: string;
+    forTextSize?: string;
+    caption?: string;
+    createdAt: string | Date;
+    seen?: string[];
+}
+
+export interface Assets {
+    _id: string,
+    url: string,
+    type: 'image' | 'video' | 'audio' | "text"
+    caption: string;
+}
+
+
+export interface CurrentTheme {
+  id: number,
+  name: string,
+  primary: string,
+  primaryBackground: string,
+  background: string,
+  textColor: string,
+  subTextColor: string,
+  primaryTextColor: string,
+  selectedTextColor: string,
+  iconColor: string,
+  primaryIconColor: string,
+  iconActiveColor: string,
+  badge: string,
+  inputColor: string,
+  inputBackground: string,
+  selectedItemColor: string,
+  borderColor: string,
+  LinkButtonColor: string,
+  secondaryLinkButtonColor: string,
+  ButtonColor: string,
+  DangerButtonColor: string,
+  SuccessButtonColor: string,
+  WarningButtonColor: string,
+  cardBackground: string,
+  color: string
+  actionButtonColor: string
+  seen: string
 }
