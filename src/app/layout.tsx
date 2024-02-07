@@ -28,7 +28,7 @@ export default function RootLayout({
             <Provider store={store}>
               <Toaster />
               {children}
-            </Provider>,
+            </Provider>
         </ThemeProvider>
       </body>
     </html>
