@@ -3,7 +3,7 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 import axios from 'axios';
 import { localhost } from '../../../../keys';
 import { skyUploadImage } from '@/lib/upload-file';
-import { getCookie, setCookie } from 'cookies-next'
+import { getCookie, setCookie, deleteCookie } from 'cookies-next'
 export const SaveTokenLocal = async (token: string) => {
   try {
     setCookie('token', token, {
@@ -25,6 +25,14 @@ export const GetTokenLocal = async () => {
     console.log("Error in getting theme from redux async storage", err)
   }
   return null;
+}
+
+export const RemoveTokenLocal = async () => {
+  try {
+    deleteCookie('token')
+  } catch (err) {
+    console.log("Error in saving theme from redux async storage", err)
+  }
 }
 
 export const loginApiHandle = createAsyncThunk(

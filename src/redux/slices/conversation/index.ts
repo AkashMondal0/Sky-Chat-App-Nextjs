@@ -1,4 +1,4 @@
-import { Assets, PrivateChat, PrivateMessage, User } from '@/interface/type';
+import { Assets, PrivateChat, PrivateMessage, PrivateMessageSeen, User, typingState } from '@/interface/type';
 import socket from '@/lib/socket';
 import { skyUploadImage, skyUploadVideo } from '@/lib/upload-file';
 import uid from '@/lib/uuid';
@@ -6,6 +6,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import axios from 'axios';
 import { localhost } from '../../../../keys';
+import { GetTokenLocal } from '../authentication';
 
 export const createPrivateChatConversation = createAsyncThunk(
   'createPrivateChatConversation/post',
@@ -45,7 +46,7 @@ export const createPrivateChatConversation = createAsyncThunk(
         conversationId: conversation._id as string,
         senderId: users[0]._id,
         receiverId: users[1]._id,
-        fileUrl: assets.length >= 1 ? assets as File[] : null,
+        // fileUrl: assets.length >= 1 ? assets as File[] : null,
         deleted: false,
         seenBy: [
           users[0]._id
@@ -53,12 +54,12 @@ export const createPrivateChatConversation = createAsyncThunk(
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }
-      socket.emit('update_Chat_List_Sender', {
-        receiverId: users[1]._id,
-        senderId: users[0]._id,
-        chatData: conversation
-      });
-      socket.emit('message_sender', newMessage2)
+      // socket.emit('update_Chat_List_Sender', {
+      //   receiverId: users[1]._id,
+      //   senderId: users[0]._id,
+      //   chatData: conversation
+      // });
+      // socket.emit('message_sender', newMessage2)
 
       return conversation
     } catch (error: any) {
@@ -127,14 +128,14 @@ export const sendMessagePrivate = createAsyncThunk(
           senderId: member._id,
           receiverId: receiver._id,
           deleted: false,
-          fileUrl: files.length >= 1 ? files : null,
+          // fileUrl: files.length >= 1 ? files : null,
           seenBy: [
             member._id,
           ],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }
-        socket.emit('message_sender', newMessage)
+        // socket.emit('message_sender', newMessage)
         return newMessage
       }
 
@@ -174,7 +175,7 @@ export const sendMessageSeenPrivate = createAsyncThunk(
     seen: PrivateMessageSeen
   }, thunkApi) => {
     try {
-      socket.emit('message_seen_sender', seen)
+      // socket.emit('message_seen_sender', seen)
       thunkApi.dispatch(addToPrivateChatListMessageSeen(seen))
       return seen
     } catch (error: any) {
@@ -183,17 +184,16 @@ export const sendMessageSeenPrivate = createAsyncThunk(
   }
 );
 
-export const getProfileChatList = createAsyncThunk(
+export const getProfileConversation = createAsyncThunk(
   'chatList/fetch',
   async (token: string | null, thunkApi) => {
     try {
 
       const response = await axios.get(`${localhost}/private/chat/list`, {
         headers: {
-          token: token ? token : await AsyncStorage.getItem("token")
+          token: token ? token : await GetTokenLocal() as string
         }
       });
-      // console.log(response.data)
       return response.data;
     } catch (error: any) {
       return thunkApi.rejectWithValue(error.response.data)
@@ -228,7 +228,7 @@ const initialState: Private_Chat_State = {
   friendListWithDetails: []
 }
 
-export const Private_Chat_Slice = createSlice({
+export const Conversation_Slice = createSlice({
   name: 'Private_chat',
   initialState,
   reducers: {
@@ -282,16 +282,16 @@ export const Private_Chat_Slice = createSlice({
   extraReducers: (builder) => {
     builder
       // fetch profile chat list
-      .addCase(getProfileChatList.pending, (state) => {
+      .addCase(getProfileConversation.pending, (state) => {
         state.loading = true;
       })
-      .addCase(getProfileChatList.fulfilled, (state, action) => {
+      .addCase(getProfileConversation.fulfilled, (state, action) => {
         state.loading = false;
         state.List = action.payload?.privateConversationList;
         state.friendListWithDetails = action.payload?.friendListWithDetails;
         state.updateList = "true"
       })
-      .addCase(getProfileChatList.rejected, (state, action) => {
+      .addCase(getProfileConversation.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -362,6 +362,6 @@ export const {
   recentChatSetter,
   addToPrivateChatListMessageTyping,
   setUserStatus
-} = Private_Chat_Slice.actions
+} = Conversation_Slice.actions
 
-export default Private_Chat_Slice.reducer
+export default Conversation_Slice.reducer

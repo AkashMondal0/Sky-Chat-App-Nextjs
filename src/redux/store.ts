@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { Authentication_Slice } from './slices/authentication'
 import { Profile_Slice } from './slices/profile'
+import { Conversation_Slice } from './slices/conversation'
 
 export const store = configureStore({
   reducer: {
     Authentication_Slice: Authentication_Slice.reducer,
     Profile_Slice: Profile_Slice.reducer,
+    Conversation_Slice: Conversation_Slice.reducer,
   },
 })
 

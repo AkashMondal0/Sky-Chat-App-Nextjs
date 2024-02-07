@@ -13,18 +13,28 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Bell } from 'lucide-react';
 import GroupCreateModal from '@/components/modal/GroupCreate';
+import { Private_Chat_State } from "@/redux/slices/conversation";
+import { Profile_State } from "@/redux/slices/profile";
+import UserCard from "./User-Card";
 
-export default function Sidebar() {
+interface SidebarProps {
+    ConversationState: Private_Chat_State
+    ProfileState: Profile_State
+}
+export default function Sidebar({ ConversationState,
+    ProfileState }: SidebarProps) {
 
-    const ArrangeDateByeDate = useMemo(() => [], [])
+    const ArrangeDateByeDate = useMemo(() => {
+        return ConversationState.List
+    }, [ConversationState.List])
 
     return (
         <div>
             <Card className="col-span-3 border-none">
                 <ScrollArea className={`h-[100dvh] w-full md:w-96 scroll-smooth`}>
                     <div className="flex justify-between w-full p-6 items-center">
-                        <CardTitle>Next Chat</CardTitle>
-                        <UserNav user={null} />
+                        <CardTitle>Sky Chat</CardTitle>
+                        <UserNav user={ProfileState.user} />
                     </div>
                     <CardContent className='p-0'>
                         <div className='flex justify-between items-center w-full mb-2 px-4'>
@@ -35,14 +45,20 @@ export default function Sidebar() {
                             <Button variant={"ghost"}><Bell className='w-6 h-6 cursor-pointer' /></Button>
                         </div>
                         <div className='px-2'>
-                            {/* {status === "error" && <div>{error?.message}</div>}
-                            {status === "pending" && <div>
+                            {ConversationState.loading && <div>{ConversationState.error}</div>}
+                            {ConversationState.loading && <div>
                                 {Array.from({ length: 10 }).map((_, i) => <UserCardLoading key={i} />)}
-                            </div>} */}
+                            </div>}
                             <>
-                                {ArrangeDateByeDate?.map((item) => { return <></> })}
+                                {ArrangeDateByeDate?.map((item) => {
+                                    return <UserCard
+                                        key={item._id}
+                                        conversationData={item}
+                                        userData={item.userDetails} />
+                                })}
                             </>
                         </div>
+                        
                     </CardContent>
                 </ScrollArea>
             </Card>

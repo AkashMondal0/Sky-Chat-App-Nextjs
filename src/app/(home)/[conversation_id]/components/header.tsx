@@ -1,10 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 import { cn } from '@/lib/utils';
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { ModeToggle } from '@/components/shared/ToggleTheme';
-import { Conversation } from '@/interface/type';
-import useClientProfile from '@/hooks/client-profile';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SheetSide } from '@/components/shared/Sheet';
 import Sidebar from '@/app/(home)/components/sidebar';
@@ -12,17 +10,19 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, Menu } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { PrivateChat } from '@/interface/type';
 
 interface HeaderProps {
-    data: Conversation | undefined
+    data: PrivateChat
 }
 
 const Header: FC<HeaderProps> = ({
     data
 }) => {
-    const currentProfile = useClientProfile()
     const router = useRouter()
-    let userData = data?.users.find((user) => user.id !== currentProfile.state.id)
+    let userData = useMemo(() => {
+        return data?.userDetails
+    }, [])
 
     return (
         <div className={cn('navbar-blur', "w-full h-16 top-0 z-50 px-2 sticky")}>
@@ -39,10 +39,12 @@ const Header: FC<HeaderProps> = ({
                         <>
                             <div className="flex items-center gap-2">
                                 <Avatar className="h-12 w-12">
-                                    <AvatarImage src={userData.imageUrl} alt="Avatar" />
-                                    <AvatarFallback>{userData.name[0]}</AvatarFallback>
+                                    <AvatarImage src={userData.profilePicture} alt="Avatar" />
+                                    <AvatarFallback>{userData.username[0]}</AvatarFallback>
                                 </Avatar>
-                                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex w-40 truncate">{userData?.name}</h1>
+                                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex w-40 truncate">
+                                    {userData?.username}
+                                </h1>
                             </div>
                         </>
                     </div>

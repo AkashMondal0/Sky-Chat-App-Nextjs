@@ -9,18 +9,15 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command"
-import { User, search_data_user } from "@/interface/type"
+import { User } from "@/interface/type"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Loader2, UserCheck, UserPlus } from "lucide-react"
 import axios from "axios"
-import { useMutation, useQuery } from '@tanstack/react-query'
 import qs from "query-string"
-import useClientProfile from "@/hooks/client-profile"
-import { addFriendToConversation } from "@/api-functions/direct-chat"
 
 interface SearchCommandProps {
   data: User[] | undefined
-  secondaryData?: search_data_user[]
+  // secondaryData?: search_data_user[]
   status?: boolean
   error?: any
 }

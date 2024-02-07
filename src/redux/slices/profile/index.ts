@@ -5,20 +5,27 @@ import axios from 'axios';
 import { localhost } from '../../../../keys';
 import { skyUploadImage, skyUploadVideo } from '@/lib/upload-file';
 import socket from '@/lib/socket';
+import { GetTokenLocal, Login, Logout, RemoveTokenLocal } from '../authentication';
+import { getProfileConversation } from '../conversation';
 
 export const fetchProfileData = createAsyncThunk(
   'profileData/fetch',
   async (token: string | null, thunkApi) => {
     try {
-      // token = token ? token : await AsyncStorage.getItem('token') as string
-      const response = await axios.get(`${localhost}/auth/authorization`, {
-        headers: {
-          Authorization: token
-        }
-      })
-      // thunkApi.dispatch(Login({ token }))
-      // thunkApi.dispatch(getProfileChatList(token) as any)
-      return response.data;
+      token = token ? token : await GetTokenLocal() as string
+      if (token) {
+        const response = await axios.get(`${localhost}/auth/authorization`, {
+          headers: {
+            Authorization: token
+          }
+        })
+        thunkApi.dispatch(Login({ token }))
+        thunkApi.dispatch(getProfileConversation(token) as any)
+        return response.data;
+      } else {
+        thunkApi.dispatch(Logout())
+        return thunkApi.rejectWithValue('Token not found')
+      }
     } catch (error: any) {
       return thunkApi.rejectWithValue(error.response.data)
     }
@@ -59,14 +66,6 @@ export const uploadStatusApi = createAsyncThunk(
 );
 
 
-const RemoveTokenLocal = async () => {
-  try {
-    // await AsyncStorage.removeItem('token')
-  } catch (err) {
-    console.log("Error in saving theme from redux async storage", err)
-  }
-}
-
 export interface Profile_State {
   user?: User | null
   loading?: boolean
@@ -99,7 +98,7 @@ export const Profile_Slice = createSlice({
       state.error = null
       state.isLogin = false
       RemoveTokenLocal()
-      socket.disconnect()
+      // socket.disconnect()
     },
     SplashLoading: (state, action: PayloadAction<boolean>) => {
       state.splashLoading = action.payload
@@ -116,7 +115,7 @@ export const Profile_Slice = createSlice({
         state.user = action.payload;
         state.splashLoading = false
         state.isLogin = true
-        socket.emit("user_connect", { id: action.payload._id }) // connect to socket
+        // socket.emit("user_connect", { id: action.payload._id }) // connect to socket
       })
       .addCase(fetchProfileData.rejected, (state, action) => {
         state.error = action.error.message;

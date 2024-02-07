@@ -1,17 +1,9 @@
-import { MessageDirect } from '@/interface/type';
 import { FC } from 'react';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
 import { CheckCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PrivateMessage } from '@/interface/type';
 interface MessagesCardProps {
-    data: MessageDirect
+    data: PrivateMessage
     profile: boolean
     isReply?: boolean
     seen: boolean

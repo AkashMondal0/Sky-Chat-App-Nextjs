@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { Toaster } from '@/components/ui/toaster'
 import { Provider } from 'react-redux'
 import { store } from '../redux/store'
+import { ProfileProvider } from '@/components/provider/Profile_provider';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,17 +19,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body suppressHydrationWarning={true}
-      className={cn(inter.className,
-        "transition-all animate-in delay-75 duration-150")}>
+        className={cn(inter.className,
+          "transition-all animate-in delay-75 duration-150")}>
         <ThemeProvider
           defaultTheme="system"
           enableSystem
           attribute='class'
           storageKey="theme">
-            <Provider store={store}>
-              <Toaster />
+          <Provider store={store}>
+            <Toaster />
+            <ProfileProvider>
               {children}
-            </Provider>
+            </ProfileProvider>
+          </Provider>
         </ThemeProvider>
       </body>
     </html>
