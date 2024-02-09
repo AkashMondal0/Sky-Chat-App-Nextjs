@@ -4,6 +4,8 @@ import axios from 'axios';
 import { localhost } from '../../../../keys';
 import { skyUploadImage } from '@/lib/upload-file';
 import { getCookie, setCookie, deleteCookie } from 'cookies-next'
+import { resetProfileState } from '../profile';
+import { resetPrivateChatList } from '../conversation';
 export const SaveTokenLocal = async (token: string) => {
   try {
     setCookie('token', token, {
@@ -78,6 +80,15 @@ export const registerApiHandle = createAsyncThunk(
     }
   }
 );
+
+export const logoutApiHandle = createAsyncThunk(
+  'logoutApi/fetch',
+  async (empty: any, thunkApi) => {
+    thunkApi.dispatch(Logout())
+    thunkApi.dispatch(resetProfileState())
+    thunkApi.dispatch(resetPrivateChatList())
+  }
+);
 export interface Auth_State {
   token?: string | null,
   isLogin: boolean
@@ -106,7 +117,7 @@ export const Authentication_Slice = createSlice({
       state.token = action.payload.token
     },
     Logout: (state) => {
-      state.isLogin = false
+      state = initialState
       state.token = null
     },
   },

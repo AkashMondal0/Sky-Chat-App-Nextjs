@@ -30,11 +30,12 @@ const Header: FC<HeaderProps> = ({
                 {/* logo */}
                 {userData ?
                     <div className='flex items-center gap-2'>
-                        <div className='md:hidden'>
+                        <div className='md:hidden cursor-pointer'>
                             {/* <SheetSide trigger={<Menu size={30} className='cursor-pointer'/>}>
                                 <Sidebar />
                             </SheetSide> */}
-                            <ChevronLeft size={30} onClick={() => router.push('/')} />
+                            <ChevronLeft 
+                            size={30} onClick={() => router.push('/')} />
                         </div>
                         <>
                             <div className="flex items-center gap-2">

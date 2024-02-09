@@ -93,11 +93,7 @@ export const Profile_Slice = createSlice({
       state.user = action.payload.user
     },
     resetProfileState: (state) => {
-      state.user = null
-      state.loading = false
-      state.error = null
-      state.isLogin = false
-      RemoveTokenLocal()
+      state = initialState
       // socket.disconnect()
     },
     SplashLoading: (state, action: PayloadAction<boolean>) => {

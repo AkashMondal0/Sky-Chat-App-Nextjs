@@ -14,12 +14,13 @@ import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
 import { Github } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { useCallback } from "react"
+import { useCallback, useContext } from "react"
 import { loginApiHandle } from "@/redux/slices/authentication"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "@/redux/store"
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from "zod"
+import { ProfileContext } from "@/components/provider/Profile_provider"
 
 const schema = z.object({
     email: z.string().email({ message: "Invalid email" })
@@ -30,6 +31,8 @@ const schema = z.object({
 
 export default function AuthenticationPage() {
     const router = useRouter()
+    const dispatch = useDispatch()
+    const profileContext = useContext(ProfileContext)
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(schema),
         defaultValues: {
@@ -38,7 +41,6 @@ export default function AuthenticationPage() {
         }
     });
     const Authentication_Slice = useSelector((state: RootState) => state.Authentication_Slice)
-    const dispatch = useDispatch()
 
 
     const onSubmit = useCallback(async (data: {
@@ -50,6 +52,7 @@ export default function AuthenticationPage() {
             password: data.password,
         }) as any)
         if (_data.payload?.token) {
+            profileContext?.StartApp()
             router.replace('/')
         }
     }, [])

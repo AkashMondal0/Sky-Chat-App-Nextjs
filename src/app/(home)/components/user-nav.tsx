@@ -16,8 +16,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { User } from "@/interface/type";
+import { logoutApiHandle } from "@/redux/slices/authentication";
 import { deleteCookie } from "cookies-next";
 import { useRouter } from "next/navigation"
+import { useCallback } from "react";
+import { useDispatch } from "react-redux";
 
 interface NavProps {
   user?: User | null
@@ -26,13 +29,15 @@ export function UserNav({
   user,
 }: NavProps) {
   const router = useRouter()
+  const dispatch = useDispatch()
 
 
-  const Logout = () => {
-    deleteCookie("profile")
-    // currentProfile.logout()
-    router.replace("/auth")
-  }
+  const handleLogout = useCallback(async () => {
+    await dispatch(logoutApiHandle("logout") as any)
+    deleteCookie('token')
+    router.replace('/auth/login')
+  }, [])
+
 
   return (
     <DropdownMenu>
@@ -70,7 +75,7 @@ export function UserNav({
           <DropdownMenuItem>New Team</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={Logout}>
+        <DropdownMenuItem onClick={handleLogout}>
           Log out
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>

@@ -276,7 +276,7 @@ export const Conversation_Slice = createSlice({
       state.recentChat = action.payload
     },
     resetPrivateChatList: (state) => {
-      state.List = []
+      state = initialState
     }
   },
   extraReducers: (builder) => {
