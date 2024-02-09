@@ -25,7 +25,7 @@ const Header: FC<HeaderProps> = ({
     }, [])
 
     return (
-        <div className={cn('navbar-blur', "w-full h-16 top-0 z-50 px-2 sticky")}>
+        <div className={cn("w-full h-16 px-2 border-b")}>
             <div className="flex justify-between items-center h-full w-full">
                 {/* logo */}
                 {userData ?

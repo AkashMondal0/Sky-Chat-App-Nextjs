@@ -10,7 +10,12 @@ import { useDispatch, useSelector } from "react-redux"
 interface ProfileProviderProps {
     children: React.ReactNode
 }
-export const ProfileContext = createContext({})
+interface ProfileContextProps {
+    StartApp?: () => void
+}
+export const ProfileContext = createContext<ProfileContextProps>({
+    StartApp: () => { }
+})
 
 
 export function ProfileProvider({ children }: ProfileProviderProps) {

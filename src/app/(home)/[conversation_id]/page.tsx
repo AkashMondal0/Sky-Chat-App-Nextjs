@@ -29,20 +29,20 @@ const ConversationPage = ({
         return <div>Conversation not found</div>
     }
     return (
-        <div className="flex w-full">
-            <div className={`h-[100dvh] w-full rounded-md border overflow-hidden`}>
-                <>
-                    <Header data={conversation}
+        <div className={`flex flex-col h-[100dvh] w-full rounded-md border overflow-hidden`}>
+            <header className="h-16">
+                <Header data={conversation}
+                // profile={Profile_Slice}
+                />
+            </header>
+                <ChatBody
+                    profile={Profile_Slice.user}
+                    data={conversation} />
+            {/* <div className="flex-grow ">
+            </div> */}
+                <ChatFooter
                     // profile={Profile_Slice}
-                    />
-                    <ChatBody
-                        profile={Profile_Slice.user}
-                        data={conversation} />
-                    <ChatFooter
-                        // profile={Profile_Slice}
-                        data={conversation} />
-                </>
-            </div>
+                    data={conversation} />
         </div>
     )
 }

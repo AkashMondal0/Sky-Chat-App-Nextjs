@@ -17,7 +17,7 @@ const UserCard = ({
     const router = useRouter()
     const searchParam = useSearchParams().get('conversation_id')
     const navigate = useCallback((id?: string) => {
-        router.push(`/${id}`)
+        router.replace(`/${id}`)
     }, [])
     const id = conversationData._id
 
