@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client"
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import MessagesCard from './message';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { PrivateChat, PrivateMessage, User } from '@/interface/type';
+import { PrivateChat, User } from '@/interface/type';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, InfiniteLoader, List, ScrollSync } from 'react-virtualized';
+import { dateFormat } from '@/lib/timeFormat';
 
 
 interface ChatBodyProps {
@@ -17,6 +18,7 @@ const ChatBody: FC<ChatBodyProps> = ({
     profile
 }) => {
     const [dimension, setDimension] = useState({ width: 0, height: 0 });
+
     useEffect(() => {
         const handleResize = () => {
             setDimension({
@@ -49,18 +51,43 @@ const ChatBody: FC<ChatBodyProps> = ({
     })
 
     const list = useMemo(() => {
-        return data?.messages || []
+        const dateSorted = [...data?.messages]
+            .slice(0, 0 + 10)
+            .filter((value, index, dateArr) => index === dateArr
+                .findIndex((time) => (dateFormat(time.createdAt) === dateFormat(value.createdAt))))
+        // .map((item) => {
+        //     item._id = new Date(item.createdAt).getTime().toString();
+        //     item = { ...item, typeDate: true }
+        //     return item
+        // })
+        const messageSorted = [...data?.messages, ...dateSorted]
+            .sort((a, b) => {
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            })
+            .reverse()
+        return messageSorted
     }, [data?.messages])
 
     if (!profile) {
         return <div>user not found</div>
     }
+    
+    const [scrollToIndex, setScrollToIndex] = useState(list.length - 1)
+
+    const scrollToBottom = () => {
+        setScrollToIndex(list.length - 1)
+    }
+
+    useEffect(() => {
+        scrollToBottom()
+    }, [list])
 
     return (
         <div className='flex-grow'>
             <AutoSizer>
                 {({ width }) => (
                     <List
+                        scrollToIndex={scrollToIndex}
                         id='style-1'
                         className='p-2'
                         width={width}

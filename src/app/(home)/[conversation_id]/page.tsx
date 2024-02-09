@@ -38,10 +38,8 @@ const ConversationPage = ({
                 <ChatBody
                     profile={Profile_Slice.user}
                     data={conversation} />
-            {/* <div className="flex-grow ">
-            </div> */}
                 <ChatFooter
-                    // profile={Profile_Slice}
+                    profile={Profile_Slice.user}
                     data={conversation} />
         </div>
     )

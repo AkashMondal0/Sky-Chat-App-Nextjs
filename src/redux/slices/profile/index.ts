@@ -4,9 +4,9 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 import axios from 'axios';
 import { localhost } from '../../../../keys';
 import { skyUploadImage, skyUploadVideo } from '@/lib/upload-file';
-import socket from '@/lib/socket';
 import { GetTokenLocal, Login, Logout, RemoveTokenLocal } from '../authentication';
 import { getProfileConversation } from '../conversation';
+import { socket } from '@/lib/socket';
 
 export const fetchProfileData = createAsyncThunk(
   'profileData/fetch',
@@ -94,7 +94,7 @@ export const Profile_Slice = createSlice({
     },
     resetProfileState: (state) => {
       state = initialState
-      // socket.disconnect()
+      socket.disconnect()
     },
     SplashLoading: (state, action: PayloadAction<boolean>) => {
       state.splashLoading = action.payload
@@ -111,7 +111,7 @@ export const Profile_Slice = createSlice({
         state.user = action.payload;
         state.splashLoading = false
         state.isLogin = true
-        // socket.emit("user_connect", { id: action.payload._id }) // connect to socket
+        socket.emit("user_connect", { id: action.payload._id }) // connect to socket
       })
       .addCase(fetchProfileData.rejected, (state, action) => {
         state.error = action.error.message;

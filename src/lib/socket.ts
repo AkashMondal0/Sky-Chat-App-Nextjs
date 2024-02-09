@@ -1,4 +1,6 @@
-import io from 'socket.io-client';
-// const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string);
-const socket = null
-export default socket;
+import { io } from 'socket.io-client';
+import { localhost } from '../../keys';
+
+const URL = localhost;
+
+export const socket = io(URL);
