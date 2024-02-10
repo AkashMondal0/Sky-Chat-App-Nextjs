@@ -54,6 +54,7 @@ export default function Sidebar({ ConversationState,
                                     return <UserCard
                                         key={item._id}
                                         conversationData={item}
+                                        profile={ProfileState.user as any}
                                         userData={item.userDetails} />
                                 })}
                             </>

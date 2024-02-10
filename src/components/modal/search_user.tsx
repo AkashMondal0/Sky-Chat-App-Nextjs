@@ -6,16 +6,7 @@ import { Loader2, UserPlus, UserPlus2, Users } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command"
+
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,7 +27,6 @@ const SearchModal: FC<SearchModalProps> = () => {
   const router = useRouter()
   const { loading, error, searchUser: data } = useSelector((state: RootState) => state.Users_Slice)
   const { List } = useSelector((state: RootState) => state.Conversation_Slice)
-  const { user } = useSelector((state: RootState) => state.Profile_Slice)
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: zodResolver(schema),

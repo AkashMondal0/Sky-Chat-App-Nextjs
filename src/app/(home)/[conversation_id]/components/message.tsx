@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { CheckCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PrivateMessage, User } from '@/interface/type';
@@ -36,4 +36,4 @@ const MessagesCard: FC<MessagesCardProps> = ({
     );
 };
 
-export default MessagesCard;
+export default memo(MessagesCard);

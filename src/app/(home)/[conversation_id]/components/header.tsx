@@ -32,8 +32,8 @@ const Header: FC<HeaderProps> = ({
                             {/* <SheetSide trigger={<Menu size={30} className='cursor-pointer'/>}>
                                 <Sidebar />
                             </SheetSide> */}
-                            <ChevronLeft 
-                            size={30} onClick={() => router.push('/')} />
+                            <ChevronLeft
+                                size={30} onClick={() => router.push('/')} />
                         </div>
                         <>
                             <div className="flex items-center gap-2">
@@ -41,9 +41,15 @@ const Header: FC<HeaderProps> = ({
                                     <AvatarImage src={userData.profilePicture} alt="Avatar" />
                                     <AvatarFallback>{userData.username[0]}</AvatarFallback>
                                 </Avatar>
-                                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex w-40 truncate">
-                                    {userData?.username}
-                                </h1>
+                                <div className='w-40'>
+                                    <div className="text-xl font-bold 
+                                    text-gray-900 dark:text-gray-100 truncate">
+                                        {userData?.username}
+                                    </div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400 ml-1">
+                                        {data?.typing ? "typing..." : userData?.status ? "online" : "offline"}
+                                    </div>
+                                </div>
                             </div>
                         </>
                     </div>

@@ -175,7 +175,7 @@ export const sendMessageSeenPrivate = createAsyncThunk(
     seen: PrivateMessageSeen
   }, thunkApi) => {
     try {
-      // socket.emit('message_seen_sender', seen)
+      socket.emit('message_seen_sender', seen)
       thunkApi.dispatch(addToPrivateChatListMessageSeen(seen))
       return seen
     } catch (error: any) {

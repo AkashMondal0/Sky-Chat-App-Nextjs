@@ -114,9 +114,13 @@ const ChatFooter: FC<ChatFooterProps> = ({
                             if (stopTyping) {
                                 onFocus()
                                 setStopTyping(false)
-                            } else {
+                            }
+                            else {
                                 debouncedHandleOnblur()
                             }
+                            if (e.target.value === "") {
+                                debouncedHandleOnblur()
+                            } 
                         },
                     })}
                 />
