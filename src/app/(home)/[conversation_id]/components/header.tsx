@@ -4,16 +4,14 @@ import { cn } from '@/lib/utils';
 import { FC, useMemo } from 'react';
 import { ModeToggle } from '@/components/shared/ToggleTheme';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SheetSide } from '@/components/shared/Sheet';
-import Sidebar from '@/app/(home)/components/sidebar';
-import { Button } from '@/components/ui/button';
 import { ChevronLeft, Menu } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { PrivateChat } from '@/interface/type';
+import { PrivateChat, User } from '@/interface/type';
 
 interface HeaderProps {
-    data: PrivateChat
+    data: PrivateChat | undefined
+    profile: User | undefined
 }
 
 const Header: FC<HeaderProps> = ({

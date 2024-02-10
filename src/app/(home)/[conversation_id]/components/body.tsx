@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client"
-import { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import MessagesCard from './message';
-import { PrivateChat, User } from '@/interface/type';
+import { PrivateChat, PrivateMessage, User } from '@/interface/type';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, InfiniteLoader, List, ScrollSync } from 'react-virtualized';
 import { dateFormat } from '@/lib/timeFormat';
 
@@ -71,7 +71,7 @@ const ChatBody: FC<ChatBodyProps> = ({
     if (!profile) {
         return <div>user not found</div>
     }
-    
+
     const [scrollToIndex, setScrollToIndex] = useState(list.length - 1)
 
     const scrollToBottom = () => {
@@ -83,8 +83,8 @@ const ChatBody: FC<ChatBodyProps> = ({
     }, [list])
 
     return (
-        <div className='flex-grow'>
-            <AutoSizer>
+        <Suspense>
+            <AutoSizer className='flex-grow'>
                 {({ width }) => (
                     <List
                         scrollToIndex={scrollToIndex}
@@ -103,8 +103,8 @@ const ChatBody: FC<ChatBodyProps> = ({
                                 rowIndex={index}
                             >
                                 {({ measure, registerChild }) => {
-                                    const element = list[index]
-                                    const seen = element.memberId === profile?._id
+                                    const element = list[index] as PrivateMessage
+                                    const seen = element.seenBy.includes(profile._id) && element.seenBy.length >= 2
                                     return <div
                                         style={{
                                             ...style,
@@ -121,7 +121,7 @@ const ChatBody: FC<ChatBodyProps> = ({
                     />
                 )}
             </AutoSizer>
-        </div>
+        </Suspense>
     );
 
 };

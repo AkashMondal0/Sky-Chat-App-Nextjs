@@ -1,5 +1,4 @@
 import { Assets, PrivateChat, PrivateMessage, PrivateMessageSeen, User, typingState } from '@/interface/type';
-import socket from '@/lib/socket';
 import { skyUploadImage, skyUploadVideo } from '@/lib/upload-file';
 import uid from '@/lib/uuid';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
@@ -7,6 +6,7 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 import axios from 'axios';
 import { localhost } from '../../../../keys';
 import { GetTokenLocal } from '../authentication';
+import { socket } from '@/lib/socket';
 
 export const createPrivateChatConversation = createAsyncThunk(
   'createPrivateChatConversation/post',
@@ -54,12 +54,12 @@ export const createPrivateChatConversation = createAsyncThunk(
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }
-      // socket.emit('update_Chat_List_Sender', {
-      //   receiverId: users[1]._id,
-      //   senderId: users[0]._id,
-      //   chatData: conversation
-      // });
-      // socket.emit('message_sender', newMessage2)
+      socket.emit('update_Chat_List_Sender', {
+        receiverId: users[1]._id,
+        senderId: users[0]._id,
+        chatData: conversation
+      });
+      socket.emit('message_sender', newMessage2)
 
       return conversation
     } catch (error: any) {
@@ -135,7 +135,7 @@ export const sendMessagePrivate = createAsyncThunk(
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }
-        // socket.emit('message_sender', newMessage)
+        socket.emit('message_sender', newMessage)
         return newMessage
       }
 

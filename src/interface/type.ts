@@ -32,9 +32,7 @@ export interface PrivateMessage {
 
 export interface PrivateChat {
     _id?: string;
-    users?: [
-        User['_id'],
-    ];
+    users?: string[];
     userDetails?: User;
     lastMessageContent: string;
     messages?: PrivateMessage[];

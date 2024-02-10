@@ -21,6 +21,7 @@ const UserCard = ({
     }, [])
     const id = conversationData._id
 
+    if (!userData) return null
 
     return <Button onClick={() => navigate(id)}
         variant={"ghost"}
