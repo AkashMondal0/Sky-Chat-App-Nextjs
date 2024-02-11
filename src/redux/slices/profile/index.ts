@@ -4,7 +4,7 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 import axios from 'axios';
 import { localhost } from '../../../../keys';
 import { skyUploadImage, skyUploadVideo } from '@/lib/upload-file';
-import { GetTokenLocal, Login, Logout, RemoveTokenLocal } from '../authentication';
+import { GetTokenLocal, Login, Logout, RemoveTokenLocal, SaveTokenLocal } from '../authentication';
 import { getProfileConversation } from '../conversation';
 import { socket } from '@/lib/socket';
 export const createConnectionApi = createAsyncThunk(
@@ -46,6 +46,18 @@ export const fetchProfileData = createAsyncThunk(
         thunkApi.dispatch(Logout())
         return thunkApi.rejectWithValue('Token not found')
       }
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response.data)
+    }
+  }
+);
+
+export const QR_Login = createAsyncThunk(
+  'QR_Login/fetch',
+  async (token: string | null, thunkApi) => {
+    try {
+      token = token ? token : await GetTokenLocal() as string
+      await SaveTokenLocal(token)
     } catch (error: any) {
       return thunkApi.rejectWithValue(error.response.data)
     }
@@ -114,7 +126,7 @@ export const Profile_Slice = createSlice({
     },
     resetProfileState: (state) => {
       state = initialState
-      socket.disconnect()
+      // socket.disconnect()
     },
     SplashLoading: (state, action: PayloadAction<boolean>) => {
       state.splashLoading = action.payload
