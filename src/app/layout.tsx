@@ -7,6 +7,8 @@ import { Toaster } from '@/components/ui/toaster'
 import { Provider } from 'react-redux'
 import { store } from '../redux/store'
 import { ProfileProvider } from '@/components/provider/Profile_provider';
+import SocketProvider from '@/context/socket';
+
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,7 +31,9 @@ export default function RootLayout({
           <Provider store={store}>
             <Toaster />
             <ProfileProvider>
-              {children}
+              <SocketProvider>
+                {children}
+              </SocketProvider>
             </ProfileProvider>
           </Provider>
         </ThemeProvider>
