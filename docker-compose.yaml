@@ -35,21 +35,21 @@ services:
   #      DATABASE_URL: mysql://root:akash@2003@mysql-container:3306/chatapp
   #      NEXT_PUBLIC_SOCKET_URL: http://locahost:3003
 
-  next-chat-socket:
-     depends_on:
-       - db
-     image: akashmondal0/socket-next-chat:latest
-    #  build:
-    #   context: ./socket-api
-    #   dockerfile: dockerfile
-    #  container_name: socket-container
-     ports:
-       - "3003:3003"
-     volumes:
-       - ./skystorage:/var/www/next-chat-socket
-     restart: always
-     networks:
-      - some-net
+  # next-chat-socket:
+  #    depends_on:
+  #      - db
+  #    image: akashmondal0/socket-next-chat:latest
+  #   #  build:
+  #   #   context: ./socket-api
+  #   #   dockerfile: dockerfile
+  #   #  container_name: socket-container
+  #    ports:
+  #      - "3003:3003"
+  #    volumes:
+  #      - ./skystorage:/var/www/next-chat-socket
+  #    restart: always
+  #    networks:
+  #     - some-net
 volumes:
     db_data:
     skystorage:

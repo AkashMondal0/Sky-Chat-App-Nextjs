@@ -15,36 +15,44 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import useClientProfile from "@/hooks/client-profile";
+import { User } from "@/interface/type";
+import { logoutApiHandle } from "@/redux/slices/authentication";
 import { deleteCookie } from "cookies-next";
 import { useRouter } from "next/navigation"
+import { useCallback } from "react";
+import { useDispatch } from "react-redux";
 
-export function UserNav() {
+interface NavProps {
+  user?: User | null
+}
+export function UserNav({
+  user,
+}: NavProps) {
   const router = useRouter()
-  const currentProfile = useClientProfile()
+  const dispatch = useDispatch()
 
-  const user = currentProfile.state
 
-  const Logout = () => {
-    deleteCookie("profile")
-    currentProfile.logout()
-    router.replace("/auth")
-  }
+  const handleLogout = useCallback(async () => {
+    await dispatch(logoutApiHandle("logout") as any)
+    deleteCookie('token')
+    router.replace('/auth/login')
+  }, [])
+
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-12 w-12 rounded-full">
           <Avatar className="h-12 w-12">
-            <AvatarImage src={user?.imageUrl || ""} alt="@shadcn" />
-            <AvatarFallback>{user?.name ? user.name[0] : ''}</AvatarFallback>
+            <AvatarImage src={user?.profilePicture} alt="profile picture" />
+            <AvatarFallback>{user?.username ? user.username[0] : 'no data'}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user?.name}</p>
+            <p className="text-sm font-medium leading-none">{user?.username}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {user?.email}
             </p>
@@ -67,7 +75,7 @@ export function UserNav() {
           <DropdownMenuItem>New Team</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={Logout}>
+        <DropdownMenuItem onClick={handleLogout}>
           Log out
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
