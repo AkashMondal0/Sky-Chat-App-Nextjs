@@ -4,7 +4,7 @@ import { PrivateMessage, PrivateMessageSeen } from "@/interface/type"
 import { socket } from "@/lib/socket"
 import { GetTokenLocal } from "@/redux/slices/authentication"
 import { addToPrivateChatList, addToPrivateChatListMessage, addToPrivateChatListMessageSeen, addToPrivateChatListMessageTyping } from "@/redux/slices/conversation"
-import { fetchProfileData } from "@/redux/slices/profile"
+import { QR_Login, fetchProfileData } from "@/redux/slices/profile"
 import React, { useCallback, useEffect, useState } from "react"
 import { createContext } from "react"
 import { useDispatch } from "react-redux"
@@ -13,12 +13,14 @@ interface ProfileProviderProps {
     children: React.ReactNode
 }
 interface ProfileContextProps {
-    StartApp: () => void,
+    StartApp: (token?: string) => void,
     isConnected?: boolean
+    handleQRLogin: (token: string) => void
 }
 export const ProfileContext = createContext<ProfileContextProps>({
     StartApp: () => { },
-    isConnected: false
+    isConnected: false,
+    handleQRLogin: () => { }
 })
 
 
@@ -26,11 +28,16 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
     const dispatch = useDispatch()
     const [isConnected, setIsConnected] = useState(socket.connected);
 
-    const StartApp = useCallback(async () => {
-        const _data = await GetTokenLocal()
+    const StartApp = useCallback(async (token?: string) => {
+        const _data = token ? token : await GetTokenLocal()
         if (_data) {
             dispatch(fetchProfileData(_data) as any)
         }
+    }, [])
+
+    const handleQRLogin = useCallback(async (token: string) => {
+        await dispatch(QR_Login(token) as any)
+        StartApp(token)
     }, [])
 
     useEffect(() => {
@@ -73,7 +80,8 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
     return <ProfileContext.Provider
         value={{
             StartApp,
-            isConnected
+            isConnected,
+            handleQRLogin
         }}>
         {children}
     </ProfileContext.Provider>
