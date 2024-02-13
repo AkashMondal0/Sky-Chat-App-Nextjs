@@ -2,19 +2,29 @@
 "use client"
 import { ScrollArea } from '@/components/ui/scroll-area'
 import React, { useMemo } from 'react'
-import Header from './components/header'
-import ChatBody from './components/body'
-import ChatFooter from './components/footer'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import { useSearchParams } from 'next/navigation'
 import { PrivateChat } from '@/interface/type'
+import dynamic from 'next/dynamic'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface ConversationPageProps {
     params: {
         conversation_id: string
     }
 }
+const Header = dynamic(() => import('./components/header'), {
+    loading: () => <LoadingComponent />
+})
+const ChatBody = dynamic(() => import('./components/body'), {
+    loading: () => <LoadingComponent />
+})
+const ChatFooter = dynamic(() => import('./components/footer'), {
+    loading: () => <LoadingComponent />
+})
+
+
 const ConversationPage = ({
     params: { conversation_id },
 }: ConversationPageProps) => {
@@ -41,15 +51,14 @@ const ConversationPage = ({
     }, [Conversation_Slice.List, conversation_id, searchQuery, searchUser])
 
     if (!conversation) {
-        return <div>Conversation not found</div>
+        return <LoadingComponent />
     }
+
     return (
         <div className={`flex flex-col h-[100dvh] w-full rounded-md border overflow-hidden`}>
-            <header className="h-16">
-                <Header
-                    profile={Profile_Slice.user || undefined}
-                    data={conversation} />
-            </header>
+            <Header
+                profile={Profile_Slice.user || undefined}
+                data={conversation} />
             <ChatBody
                 profile={Profile_Slice.user || undefined}
                 data={conversation} />
@@ -62,3 +71,23 @@ const ConversationPage = ({
 }
 
 export default ConversationPage
+
+const LoadingComponent = () => {
+    return <div className='w-full h-[100dvh] flex flex-col'>
+        <div className='flex my-4 mx-2 h-16'>
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className='flex flex-col'>
+                <Skeleton className="h-5 w-72 m-1" />
+                <Skeleton className="h-4 w-52 m-1" />
+            </div>
+        </div>
+        <ScrollArea className="flex-grow px-4 my-2 w-full">
+            {Array(14).fill(0).map((_, i) => <div key={i} className="flex flex-col">
+                <Skeleton className={`h-12 w-40 rounded-2xl my-2 
+            ${Math.floor(Math.random() * 12) > 6 ? "ml-auto" : ""}`} />
+            </div>)}
+        </ScrollArea>
+
+        <div className='px-5 h-16 sticky bottom-0 z-1 my-2'><Skeleton className="h-10 w-full rounded-3xl" /></div>
+    </div>
+}

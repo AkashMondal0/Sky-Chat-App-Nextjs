@@ -20,10 +20,10 @@ const Header: FC<HeaderProps> = ({
     const router = useRouter()
     let userData = useMemo(() => {
         return data?.userDetails
-    }, [])
+    }, [data?.userDetails])
 
     return (
-        <div className={cn("w-full h-16 px-2 border-b")}>
+        <div className={cn("w-full h-16 px-2 border-b h-16")}>
             <div className="flex justify-between items-center h-full w-full">
                 {/* logo */}
                 {userData ?

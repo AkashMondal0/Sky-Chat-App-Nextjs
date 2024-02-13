@@ -6,21 +6,30 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { UserNav } from "./user-nav"
 import SearchModal from "@/components/modal/search_user"
-import { useMemo } from 'react';
+import { Suspense, useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Bell } from 'lucide-react';
-import GroupCreateModal from '@/components/modal/GroupCreate';
 import { Private_Chat_State } from "@/redux/slices/conversation";
 import { Profile_State } from "@/redux/slices/profile";
-import UserCard from "./User-Card";
+import React from "react";
+import dynamic from 'next/dynamic'
 
 interface SidebarProps {
     ConversationState: Private_Chat_State
     ProfileState: Profile_State
 }
+
+
+const UserCard = dynamic(() => import('./User-Card'), {
+    loading: () => <UserCardLoading />,
+})
+const UserNav = dynamic(() => import('./user-nav'), {
+    loading: () => <Skeleton className="h-12 w-12 rounded-full" />,
+})
+
+
 export default function Sidebar({ ConversationState,
     ProfileState }: SidebarProps) {
 
@@ -46,20 +55,15 @@ export default function Sidebar({ ConversationState,
                         </div>
                         <div className='px-2'>
                             {ConversationState.loading && <div>{ConversationState.error}</div>}
-                            {ConversationState.loading && <div>
-                                {Array.from({ length: 10 }).map((_, i) => <UserCardLoading key={i} />)}
-                            </div>}
-                            <>
-                                {ArrangeDateByeDate?.map((item) => {
-                                    return <UserCard
-                                        key={item._id}
-                                        conversationData={item}
-                                        profile={ProfileState.user as any}
-                                        userData={item.userDetails} />
-                                })}
-                            </>
+                            {ArrangeDateByeDate?.map((item) => {
+                                return <UserCard
+                                    key={item._id}
+                                    conversationData={item}
+                                    profile={ProfileState.user as any}
+                                    userData={item.userDetails} />
+                            })}
                         </div>
-                        
+
                     </CardContent>
                 </ScrollArea>
             </Card>

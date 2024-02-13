@@ -25,7 +25,7 @@ import { useDispatch } from "react-redux";
 interface NavProps {
   user?: User | null
 }
-export function UserNav({
+export default function UserNav({
   user,
 }: NavProps) {
   const router = useRouter()
@@ -45,7 +45,7 @@ export function UserNav({
         <Button variant="ghost" className="relative h-12 w-12 rounded-full">
           <Avatar className="h-12 w-12">
             <AvatarImage src={user?.profilePicture} alt="profile picture" />
-            <AvatarFallback>{user?.username ? user.username[0] : 'no data'}</AvatarFallback>
+            <AvatarFallback>{user?.username ? user.username[0] : ''}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

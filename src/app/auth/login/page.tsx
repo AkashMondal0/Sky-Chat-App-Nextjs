@@ -61,8 +61,7 @@ export default function AuthenticationPage() {
     }, [])
 
     const handleLoginToggle = useCallback(() => {
-        setLoginToggle(true)
-
+        setLoginToggle(!loginToggle)
     }, [loginToggle])
 
     useEffect(() => {
@@ -93,7 +92,7 @@ export default function AuthenticationPage() {
 
                 {loginToggle ?
                     <div>
-                        <div className="w-[256px] h-[256px] p-10 max-w-sm mx-auto bg-background">
+                        <div className="w-[256px] h-[256px] p-1 max-w-sm mx-auto bg-background bg-white">
                             <QRCode
                                 size={256}
                                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}
