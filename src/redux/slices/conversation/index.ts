@@ -164,7 +164,8 @@ export const sendMessagePrivate = createAsyncThunk(
           }
         })
 
-        return sendMessageApi(assets as File[])
+        // return sendMessageApi(assets as File[]) as any
+        return sendMessageApi([]) as any
       } else {
         return sendMessageApi([])
       }
