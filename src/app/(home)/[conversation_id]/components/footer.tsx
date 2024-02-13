@@ -80,7 +80,7 @@ const ChatFooter: FC<ChatFooterProps> = ({
                     conversation: { ...res?.payload, userDetails: profile },
                     assets: []
                 }) as any)
-                profileState.StartApp()
+                // profileState.StartApp()
                 router.replace(`/${res?.payload._id}`)
             }
             reset()

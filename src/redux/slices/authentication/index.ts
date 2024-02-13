@@ -118,7 +118,6 @@ export const Authentication_Slice = createSlice({
     },
     Logout: (state) => {
       state = initialState
-      state.token = null
     },
   },
   extraReducers(builder) {

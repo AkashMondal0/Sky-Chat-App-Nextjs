@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import SearchModal from "@/components/modal/search_user"
-import { Suspense, useMemo } from 'react';
+import { Suspense, useCallback, useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Bell } from 'lucide-react';
@@ -15,6 +15,7 @@ import { Private_Chat_State } from "@/redux/slices/conversation";
 import { Profile_State } from "@/redux/slices/profile";
 import React from "react";
 import dynamic from 'next/dynamic'
+import { useRouter } from "next/navigation";
 
 interface SidebarProps {
     ConversationState: Private_Chat_State
@@ -32,10 +33,15 @@ const UserNav = dynamic(() => import('./user-nav'), {
 
 export default function Sidebar({ ConversationState,
     ProfileState }: SidebarProps) {
+    const router = useRouter()
 
     const ArrangeDateByeDate = useMemo(() => {
         return ConversationState.List
     }, [ConversationState.List])
+
+    const navigateToPage = useCallback((id?: string) => {
+        router.replace(`/${id}`)
+    }, [])
 
     return (
         <div>
@@ -57,6 +63,7 @@ export default function Sidebar({ ConversationState,
                             {ConversationState.loading && <div>{ConversationState.error}</div>}
                             {ArrangeDateByeDate?.map((item) => {
                                 return <UserCard
+                                    onclick={() => { navigateToPage(item._id) }}
                                     key={item._id}
                                     conversationData={item}
                                     profile={ProfileState.user as any}

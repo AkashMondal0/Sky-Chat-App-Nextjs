@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useRouter, useSearchParams } from 'next/navigation';
+import {useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PrivateChat, PrivateMessage, User } from '@/interface/type';
@@ -10,18 +10,16 @@ interface UserCardProps {
     userData: User | any
     conversationData: PrivateChat
     profile?: User | undefined
+    onclick: () => void
 }
 
 const UserCard = ({
     userData,
     conversationData,
-    profile
+    profile,
+    onclick
 }: UserCardProps) => {
-    const router = useRouter()
     const searchParam = useSearchParams().get('conversation_id')
-    const navigate = useCallback((id?: string) => {
-        router.replace(`/${id}`)
-    }, [])
     const id = conversationData._id
 
     // count unseen messages
@@ -35,7 +33,7 @@ const UserCard = ({
 
     if (!userData) return null
 
-    return <Button onClick={() => navigate(id)}
+    return <Button onClick={onclick}
         variant={"ghost"}
         className={`${searchParam === id && "bg-accent"} flex items-center py-3 w-full h-auto rounded-2xl my-3`}
         key={conversationData._id}>

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import { FC, useCallback, useEffect } from 'react';
 import { Modal } from '../shared/Modal';
@@ -36,7 +37,6 @@ const SearchModal: FC<SearchModalProps> = () => {
   });
 
   const handleSearch = useCallback((search: string) => {
-    console.log("search", search)
     dispatch(fetchSearchUser(search) as any)
   }, []);
 

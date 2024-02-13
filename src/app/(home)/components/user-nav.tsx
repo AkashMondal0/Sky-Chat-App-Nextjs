@@ -1,4 +1,5 @@
 'use client'
+import { ProfileContext } from "@/components/provider/Profile_provider";
 import {
   Avatar,
   AvatarFallback,
@@ -16,11 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { User } from "@/interface/type";
-import { logoutApiHandle } from "@/redux/slices/authentication";
-import { deleteCookie } from "cookies-next";
-import { useRouter } from "next/navigation"
-import { useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useCallback, useContext } from "react";
 
 interface NavProps {
   user?: User | null
@@ -28,14 +25,11 @@ interface NavProps {
 export default function UserNav({
   user,
 }: NavProps) {
-  const router = useRouter()
-  const dispatch = useDispatch()
+  const profile = useContext(ProfileContext)
 
 
   const handleLogout = useCallback(async () => {
-    await dispatch(logoutApiHandle("logout") as any)
-    deleteCookie('token')
-    router.replace('/auth/login')
+    profile.Logout()
   }, [])
 
 

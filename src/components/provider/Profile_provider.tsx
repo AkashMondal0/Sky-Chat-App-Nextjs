@@ -2,9 +2,11 @@
 "use client"
 import { PrivateMessage, PrivateMessageSeen } from "@/interface/type"
 import { socket } from "@/lib/socket"
-import { GetTokenLocal } from "@/redux/slices/authentication"
-import { addToPrivateChatList, addToPrivateChatListMessage, addToPrivateChatListMessageSeen, addToPrivateChatListMessageTyping } from "@/redux/slices/conversation"
-import { QR_Login, fetchProfileData } from "@/redux/slices/profile"
+import { GetTokenLocal, Logout } from "@/redux/slices/authentication"
+import { addToPrivateChatList, addToPrivateChatListMessage, addToPrivateChatListMessageSeen, addToPrivateChatListMessageTyping, resetPrivateChatList } from "@/redux/slices/conversation"
+import { QR_Login, fetchProfileData, resetProfileState } from "@/redux/slices/profile"
+import { deleteCookie } from "cookies-next"
+import { useRouter } from "next/navigation"
 import React, { useCallback, useEffect, useState } from "react"
 import { createContext } from "react"
 import { useDispatch } from "react-redux"
@@ -16,23 +18,34 @@ interface ProfileContextProps {
     StartApp: (token?: string) => void,
     isConnected?: boolean
     handleQRLogin: (token: string) => void
+    Logout: () => void
 }
 export const ProfileContext = createContext<ProfileContextProps>({
     StartApp: () => { },
     isConnected: false,
-    handleQRLogin: () => { }
+    handleQRLogin: () => { },
+    Logout: () => { }
 })
 
 
 export function ProfileProvider({ children }: ProfileProviderProps) {
     const dispatch = useDispatch()
     const [isConnected, setIsConnected] = useState(socket.connected);
+    const router = useRouter()
 
     const StartApp = useCallback(async (token?: string) => {
         const _data = token ? token : await GetTokenLocal()
         if (_data) {
             dispatch(fetchProfileData(_data) as any)
         }
+    }, [])
+    const OffApp = useCallback(async () => {
+        dispatch(Logout())
+        dispatch(resetProfileState())
+        dispatch(resetPrivateChatList())
+        deleteCookie('token')
+        router.replace('/auth/login')
+        router.refresh()
     }, [])
 
     const handleQRLogin = useCallback(async (token: string) => {
@@ -48,7 +61,6 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
 
         socket.on("message_receiver", (data: PrivateMessage) => {
             dispatch(addToPrivateChatListMessage(data))
-            // console.log(data)
         })
 
         socket.on("message_seen_receiver", (data: PrivateMessageSeen) => {
@@ -81,7 +93,8 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
         value={{
             StartApp,
             isConnected,
-            handleQRLogin
+            handleQRLogin,
+            Logout: OffApp
         }}>
         {children}
     </ProfileContext.Provider>
