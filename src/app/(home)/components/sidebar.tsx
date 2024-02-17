@@ -15,7 +15,7 @@ import { Private_Chat_State } from "@/redux/slices/conversation";
 import { Profile_State } from "@/redux/slices/profile";
 import React from "react";
 import dynamic from 'next/dynamic'
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface SidebarProps {
     ConversationState: Private_Chat_State
@@ -34,13 +34,18 @@ const UserNav = dynamic(() => import('./user-nav'), {
 export default function Sidebar({ ConversationState,
     ProfileState }: SidebarProps) {
     const router = useRouter()
+    const asPath = usePathname()
 
     const ArrangeDateByeDate = useMemo(() => {
         return ConversationState.List
     }, [ConversationState.List])
 
     const navigateToPage = useCallback((id?: string) => {
-        router.replace(`/${id}`)
+        if (asPath !== "/") {
+            router.replace(`/${id}`)
+        }else{
+            router.push(`/${id}`)
+        }
     }, [])
 
     return (

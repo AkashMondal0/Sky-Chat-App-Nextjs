@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
-import { useSearchParams } from 'next/navigation'
+import { redirect, useSearchParams } from 'next/navigation'
 import { PrivateChat } from '@/interface/type'
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -51,7 +51,7 @@ const ConversationPage = ({
     }, [Conversation_Slice.List, conversation_id, searchQuery, searchUser])
 
     if (!conversation) {
-        return <LoadingComponent />
+        return redirect("/")
     }
 
     return (
