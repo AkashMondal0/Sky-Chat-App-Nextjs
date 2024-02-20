@@ -1,15 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
-import { PrivateMessage, PrivateMessageSeen } from "@/interface/type"
+import { GameRequest, PrivateMessage, PrivateMessageSeen } from "@/interface/type"
 import { socket } from "@/lib/socket"
 import { GetTokenLocal, Logout } from "@/redux/slices/authentication"
 import { addToPrivateChatList, addToPrivateChatListMessage, addToPrivateChatListMessageSeen, addToPrivateChatListMessageTyping, resetPrivateChatList } from "@/redux/slices/conversation"
 import { QR_Login, fetchProfileData, resetProfileState } from "@/redux/slices/profile"
 import { deleteCookie } from "cookies-next"
 import { useRouter } from "next/navigation"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { createContext } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+import { toast } from "sonner"
+import { GameRequestToast } from "../shared/MyAlert"
+import { gameRequestSet } from "@/redux/slices/games"
+import { RootState } from "@/redux/store"
+import { InGameData } from "@/app/games/[roomId]/page"
 
 interface ProfileProviderProps {
     children: React.ReactNode
@@ -39,6 +44,7 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
             dispatch(fetchProfileData(_data) as any)
         }
     }, [])
+
     const OffApp = useCallback(async () => {
         dispatch(Logout())
         dispatch(resetProfileState())
@@ -70,6 +76,42 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
             dispatch(addToPrivateChatListMessageTyping(data))
         })
 
+        // game request
+        socket.on("incoming_game_request_receiver", (data: GameRequest) => {
+            // dispatch(gameRequestSet(data))
+            toast.custom((t) => <GameRequestToast data={data} onClick={() => {
+                const { receiverData, senderData } = data
+                const randomTurn = Math.random() > 0.5 ? "X" : "O"
+                const newRespond = {
+                    ...data,
+                    receiverData: senderData,
+                    senderData: receiverData,
+                    receiverId: senderData?._id,
+                    senderId: receiverData?._id,
+                    turn: randomTurn
+                }
+                router.push(`/games/${data._id}?userId=${newRespond.receiverData?._id}&turn=${randomTurn}`)
+                socket.emit("game_request_Answer_sender", newRespond)
+                toast.dismiss(t)
+            }} />)
+        })
+        socket.on("game_request_Answer_receiver", (data: GameRequest) => {
+            const { receiverData, senderData, turn } = data
+          const _turn = turn === "X" ? "O" : "X"
+            const startRespond: InGameData = {
+                roomId: data._id,
+                state: [null, null, null, null, null, null, null, null, null],
+                currentTurn: _turn,
+                type: "START_GAME",
+                firstTurn: "X",
+                turnCount: 0,
+                senderId: receiverData?._id as string,
+                receiverId: senderData?._id as string,
+            }
+            socket.emit("in_game_sender", startRespond)
+            router.push(`/games/${data._id}?userId=${data.senderData?._id}&turn=${_turn}`)
+        })
+
         socket.on("connect", () => {
             setIsConnected(true)
         })
@@ -85,6 +127,9 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
             socket.off("message_typing_receiver")
             socket.off("connect")
             socket.off("disconnect")
+            socket.off("incoming_game_request_receiver")
+            socket.off("game_request_Answer_receiver")
+
         }
     }, []);
 

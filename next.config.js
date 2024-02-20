@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
-  reactStrictMode: true,
+  // reactStrictMode: true,
   images: {
     domains: ["http://13.127.232.152:4001/"]
   },

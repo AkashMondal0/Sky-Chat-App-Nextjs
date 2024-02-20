@@ -4,10 +4,15 @@ import { cn } from '@/lib/utils';
 import { FC, useMemo } from 'react';
 import { ModeToggle } from '@/components/shared/ToggleTheme';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronLeft, Menu } from 'lucide-react';
+import { ChevronLeft, Gamepad2, Menu } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PrivateChat, User } from '@/interface/type';
+import { Button } from '@/components/ui/button';
+import { useDispatch, useSelector } from 'react-redux';
+import { SendGameRequest } from '@/redux/slices/games';
+import uid from '@/lib/uuid';
+import { RootState } from '@/redux/store';
 
 interface HeaderProps {
     data: PrivateChat | undefined
@@ -15,15 +20,33 @@ interface HeaderProps {
 }
 
 const Header: FC<HeaderProps> = ({
-    data
+    data,
+    profile
 }) => {
     const router = useRouter()
-    let userData = useMemo(() => {
+    const dispatch = useDispatch()
+    const userData = useMemo(() => {
         return data?.userDetails
     }, [data?.userDetails])
 
+    const handleGameRequest = async () => {
+        if (userData && data?._id && profile) {
+            const createNewRoom = {
+                receiverId: userData._id,
+                receiverData: userData,
+                senderId: profile._id,
+                senderData: profile,
+                conversationId: data?._id,
+                createdAt: new Date().toISOString(),
+                _id: uid()
+            }
+            await dispatch(SendGameRequest(createNewRoom) as any)
+            // router.push(`/games/${createNewRoom?._id}?userId=${userData._id}`)
+        }
+    }
+
     return (
-        <div className={cn("w-full h-16 px-2 border-b h-16")}>
+        <div className={cn("w-full h-16 px-2 border-b")}>
             <div className="flex justify-between items-center h-full w-full">
                 {/* logo */}
                 {userData ?
@@ -65,13 +88,21 @@ const Header: FC<HeaderProps> = ({
                 <div className="items-center gap-3 flex">
                     {/*  */}
                     {/* mode toggle */}
-                    <div className='md:hidden flex'>
+                    <div className='md:hidden flex gap-2'>
                         <ModeToggle />
+                        <Button variant="outline" size="icon" onClick={handleGameRequest}>
+                            <Gamepad2 size={30} />
+                        </Button>
                     </div>
                 </div>
                 {/*  */}
-                <div className='hidden md:flex'>
+                <div className='hidden md:flex gap-2'>
                     <ModeToggle />
+                    <Button variant="outline" size="icon"
+                        // disabled={alreadyRequested ? true : false}
+                        onClick={handleGameRequest}>
+                        <Gamepad2 size={30} />
+                    </Button>
                 </div>
             </div>
         </div>
