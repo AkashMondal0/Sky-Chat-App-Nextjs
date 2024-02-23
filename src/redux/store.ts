@@ -3,6 +3,7 @@ import { Authentication_Slice } from './slices/authentication'
 import { Profile_Slice } from './slices/profile'
 import { Conversation_Slice } from './slices/conversation'
 import { Users_Slice } from './slices/users'
+import { Games_Slice } from './slices/games'
 
 
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
     Profile_Slice: Profile_Slice.reducer,
     Conversation_Slice: Conversation_Slice.reducer,
     Users_Slice: Users_Slice.reducer,
+    Games_Slice:Games_Slice.reducer
   },
 })
 

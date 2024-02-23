@@ -10,7 +10,7 @@ import SearchModal from "@/components/modal/search_user"
 import { Suspense, useCallback, useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Bell } from 'lucide-react';
+import { Bell, Gamepad2 } from 'lucide-react';
 import { Private_Chat_State } from "@/redux/slices/conversation";
 import { Profile_State } from "@/redux/slices/profile";
 import React from "react";
@@ -43,7 +43,7 @@ export default function Sidebar({ ConversationState,
     const navigateToPage = useCallback((id?: string) => {
         if (asPath !== "/") {
             router.replace(`/${id}`)
-        }else{
+        } else {
             router.push(`/${id}`)
         }
     }, [])
@@ -62,7 +62,18 @@ export default function Sidebar({ ConversationState,
                                 <SearchModal />
                                 {/* <GroupCreateModal /> */}
                             </div>
-                            <Button variant={"ghost"}><Bell className='w-6 h-6 cursor-pointer' /></Button>
+                            <div>
+                            <Button variant={"ghost"} onClick={() => {
+                               
+                            }}>
+                                <Bell className='w-6 h-6 cursor-pointer' />
+                            </Button>
+                            <Button variant={"ghost"} onClick={() => {
+                                router.push('/games')
+                            }}>
+                                <Gamepad2 className='w-6 h-6 cursor-pointer' />
+                            </Button>
+                            </div>
                         </div>
                         <div className='px-2'>
                             {ConversationState.loading && <div>{ConversationState.error}</div>}

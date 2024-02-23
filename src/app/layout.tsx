@@ -3,11 +3,10 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/provider/Theme_Provider'
 import { cn } from '@/lib/utils'
-import { Toaster } from '@/components/ui/toaster'
 import { Provider } from 'react-redux'
 import { store } from '../redux/store'
 import { ProfileProvider } from '@/components/provider/Profile_provider';
-
+import { Toaster } from "@/components/ui/sonner"
 const inter = Inter({ subsets: ['latin'] })
 
 export default function RootLayout({
@@ -27,7 +26,7 @@ export default function RootLayout({
           attribute='class'
           storageKey="theme">
           <Provider store={store}>
-            <Toaster />
+            <Toaster position="top-center" closeButton />
             <ProfileProvider>
               {children}
             </ProfileProvider>
