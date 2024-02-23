@@ -40,7 +40,7 @@ const Header: FC<HeaderProps> = ({
                 createdAt: new Date().toISOString(),
                 _id: uid()
             }
-            await dispatch(SendGameRequest(createNewRoom) as any)
+            await dispatch(SendGameRequest(createNewRoom as any) as any)
             // router.push(`/games/${createNewRoom?._id}?userId=${userData._id}`)
         }
     }

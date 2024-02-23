@@ -10,6 +10,19 @@ import { redirect, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 export interface InGameData {
     roomId: string
@@ -17,10 +30,9 @@ export interface InGameData {
     senderId: string
     receiverId: string
     currentTurn: "X" | "O"
-    type: "START_GAME" | "END_GAME" | "DRAW" | "IN_GAME"
+    type: "START_GAME" | "END_GAME" | "DRAW" | "IN_GAME" | "EXIT_GAME"
     firstTurn: "X" | "O"
     turnCount: number,
-    userTurn: boolean
     win?: "X" | "O"
 }
 
@@ -38,6 +50,7 @@ const TicTacToe = ({
         roomId: string
     }
 }) => {
+    const router = useRouter()
     const userId = useSearchParams().get("userId")
     const MyTurnIs = useSearchParams().get("turn")
     const profile = useSelector((state: RootState) => state.Profile_Slice.user)
@@ -45,6 +58,12 @@ const TicTacToe = ({
     const [state, setState] = React.useState(Array(9).fill(null))
     const [currentTurn, setCurrentTurn] = React.useState<"X" | "O">("X")
     const [turnCount, setTurnCount] = React.useState(0)
+    const [dialogOpen, setDialogOpen] = React.useState({
+        open: false,
+        type: "",
+        message: "",
+        subMessage: ""
+    })
     const [winHistory, setWinHistory] = React.useState<WinHistory>({
         user: profile as User,
         winCount: 0,
@@ -108,18 +127,19 @@ const TicTacToe = ({
         for (let i = 0; i < win.length; i++) {
             const [a, b, c] = win[i]
             if (state[a] && state[a] === state[b] && state[a] === state[c]) {
-                toast.success(`${winnerName(state[a])} won! `, {
-                    duration: 5000
-                })
+                // toast.success(`${winnerName(state[a])} won! `, {
+                //     duration: 5000
+                // })
                 setState(Array(9).fill(null))
                 const Random = Math.random() > 0.5 ? "X" : "O"
                 setCurrentTurn(Random)
                 setTurnCount(0)
-                // setWinHistory({
-                //     ...winHistory,
-                //     winCount: winHistory.winCount + 1,
-                //     totalGames: winHistory.totalGames + 1
-                // })
+                setDialogOpen({
+                    open: true,
+                    type: "END_GAME",
+                    message: `${winnerName(state[a])} won! `,
+                    subMessage: "Do you want to play again?"
+                })
                 socket.emit('in_game_sender', {
                     roomId,
                     state: Array(9).fill(null),
@@ -134,6 +154,7 @@ const TicTacToe = ({
         }
     }, [])
 
+
     const currentTurnName = useMemo(() => {
         if (currentTurn === MyTurnIs) {
             return "Your"
@@ -141,6 +162,27 @@ const TicTacToe = ({
             return remotePlayer?.username
         }
     }, [currentTurn])
+
+    const checkDraw = useCallback(() => {
+        if (turnCount === 9) {
+            setDialogOpen({
+                open: true,
+                type: "END_GAME",
+                message: `Game Draw! `,
+                subMessage: "Do you want to play again?"
+            })
+            socket.emit('in_game_sender', {
+                roomId,
+                state: Array(9).fill(null),
+                senderId: profile?._id,
+                receiverId: remotePlayer?._id,
+                currentTurn: "X",
+                turnCount: 0,
+                type: "DRAW"
+            })
+
+        }
+    }, [])
 
     const setData = (data: InGameData) => {
         setState(data.state)
@@ -156,10 +198,30 @@ const TicTacToe = ({
                     setData(data)
                     break;
                 case "END_GAME":
-                    toast.success(`${winnerName(data.win)} won!`, {
-                        duration: 5000
+                    // toast.success(`${winnerName(data.win)} won!`, {
+                    //     duration: 5000
+                    // })
+                    setDialogOpen({
+                        open: true,
+                        type: "END_GAME",
+                        message: `${winnerName(data.win)} won! `,
+                        subMessage: "Do you want to play again?"
                     })
-
+                    setData(data)
+                    break;
+                case "DRAW":
+                    setDialogOpen({
+                        open: true,
+                        type: "END_GAME",
+                        message: `Game Draw! `,
+                        subMessage: "Do you want to play again?"
+                    })
+                    setData(data)
+                    break;
+                case "EXIT_GAME":
+                    router.back()
+                    break;
+                case "START_GAME":
                     setData(data)
                     break;
                 default:
@@ -173,7 +235,65 @@ const TicTacToe = ({
     }, [])
 
 
+    const reSetDialog = useCallback(() => {
+        setDialogOpen({
+            ...dialogOpen,
+            open: false,
+            type: "",
+            message: "",
+            subMessage: ""
+        })
+        router.back()
+        socket.emit('in_game_sender', {
+            roomId,
+            state: Array(9).fill(null),
+            senderId: profile?._id,
+            receiverId: remotePlayer?._id,
+            currentTurn: "X",
+            turnCount: 0,
+            type: "EXIT_GAME"
+        })
+    }, [dialogOpen])
 
+    const playAgain = useCallback(() => {
+        setDialogOpen({
+            ...dialogOpen,
+            open: false,
+            type: "",
+            message: "",
+            subMessage: ""
+        })
+        socket.emit('in_game_sender', {
+            roomId,
+            state: Array(9).fill(null),
+            senderId: profile?._id,
+            receiverId: remotePlayer?._id,
+            currentTurn: "X",
+            turnCount: 0,
+            type: "START_GAME"
+        })
+    }, [])
+
+    const resetGame = useCallback(() => {
+        setState(Array(9).fill(null))
+        setCurrentTurn("X")
+        setTurnCount(0)
+        setDialogOpen({
+            open: false,
+            type: "",
+            message: "",
+            subMessage: ""
+        })
+        socket.emit('in_game_sender', {
+            roomId,
+            state: Array(9).fill(null),
+            senderId: profile?._id,
+            receiverId: remotePlayer?._id,
+            currentTurn: "X",
+            turnCount: 0,
+            type: "START_GAME"
+        })
+    }, [])
 
     return (
         <div id="board" className='flex justify-center items-center h-screen px-2'>
@@ -192,6 +312,7 @@ const TicTacToe = ({
                                 </p>
                                 <p>{MyTurnIs}</p>
                             </div>
+                            <Button onClick={resetGame}>Reset Game</Button>
                             {remotePlayer && <div className='text-center'>
                                 <MyAvatar src={remotePlayer?.profilePicture || ""} alt={remotePlayer?.username as string} />
                                 <p>
@@ -221,6 +342,23 @@ const TicTacToe = ({
                     </div>
                 </div>
             </div>
+            <AlertDialog open={dialogOpen.open}>
+                <AlertDialogContent >
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            {dialogOpen.message}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {dialogOpen.subMessage}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={reSetDialog}>Exit</AlertDialogCancel>
+                        <AlertDialogAction onClick={playAgain}>Continue</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
         </div>
     )
 }

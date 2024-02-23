@@ -3,4 +3,4 @@ import { localhost } from '../../keys';
 
 const URL = localhost;
 
-export const socket = io(URL);
+export const socket = io(URL as string);
