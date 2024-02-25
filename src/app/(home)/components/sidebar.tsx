@@ -10,7 +10,7 @@ import SearchModal from "@/components/modal/search_user"
 import { Suspense, useCallback, useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Bell, Gamepad2 } from 'lucide-react';
+import { Bell, Gamepad2, Paintbrush2Icon } from 'lucide-react';
 import { Private_Chat_State } from "@/redux/slices/conversation";
 import { Profile_State } from "@/redux/slices/profile";
 import React from "react";
@@ -69,9 +69,9 @@ export default function Sidebar({ ConversationState,
                                 <Bell className='w-6 h-6 cursor-pointer' />
                             </Button>
                             <Button variant={"ghost"} onClick={() => {
-                                router.push('/games')
+                                router.push('/docs')
                             }}>
-                                <Gamepad2 className='w-6 h-6 cursor-pointer' />
+                                <Paintbrush2Icon className='w-6 h-6 cursor-pointer' />
                             </Button>
                             </div>
                         </div>

@@ -1,26 +1,48 @@
-import React from 'react'
-import { PresetSelector } from './preset-selector'
-import { PresetSave } from './preset-save'
-import { CodeViewer } from './code-viewer'
-import { PresetShare } from './preset-share'
-import { PresetActions } from './preset-actions'
-import { presets } from '../data/presets'
+/* eslint-disable @next/next/no-img-element */
+'use client'
+import { cn } from '@/lib/utils';
+import { FC, useMemo } from 'react';
+import { ModeToggle } from '@/components/shared/ToggleTheme';
+import { PrivateChat, User } from '@/interface/type';
+import { Button } from '@/components/ui/button';
+import { LogOutIcon, Share2Icon } from 'lucide-react';
 
-const Header = () => {
-  return (
-    <div className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
-          <h2 className="text-lg font-semibold">Playground</h2>
-          <div className="ml-auto flex w-full space-x-2 sm:justify-end">
-            <PresetSelector presets={presets} />
-            <PresetSave />
-            <div className="hidden space-x-2 md:flex">
-              <CodeViewer />
-              <PresetShare />
-            </div>
-            <PresetActions />
-          </div>
-        </div>
-  )
+interface HeaderProps {
 }
 
-export default Header
+const Header: FC<HeaderProps> = ({
+
+}) => {
+
+    const handleGameRequest = async () => {
+
+    }
+
+    return (
+        <div className={cn("w-full h-[4rem]")}>
+            <div className="flex justify-between items-center h-full w-full">
+                {/* logo */}
+                <>logo</>
+                <div>
+                    <Button variant="outline">Document</Button>
+                    <Button variant="outline">Both</Button>
+                    <Button variant="outline">Canvas</Button>
+                </div>
+                {/* navigation */}
+                <div className='hidden md:flex gap-2'>
+                    <ModeToggle />
+                    <Button variant={"link"}>
+                        <Share2Icon className="mr-2 h-4 w-4" />
+                        Invite
+                    </Button>
+                    <Button>
+                        <LogOutIcon className="mr-2 h-4 w-4" />
+                        Leave
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Header;
