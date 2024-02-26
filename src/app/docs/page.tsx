@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation"
 import { useCallback, useContext, useRef } from "react"
 import { useSelector } from "react-redux"
 import { SketchContext } from "./context"
+import queryString from 'query-string';
 
 
 
@@ -20,7 +21,6 @@ function DocsHome() {
   const router = useRouter()
   const profile = useSelector((state: RootState) => state.Profile_Slice)
   const input = useRef<HTMLInputElement>(null)
-  const AdminId = useRef<HTMLInputElement>(null)
   const sketchState = useContext(SketchContext)
 
   const createNewPlayRoom = useCallback(() => {
@@ -35,21 +35,23 @@ function DocsHome() {
         canvasData: []
       }],
       roomId: roomId,
-      AuthorId: profile.user?._id as string,
+      AuthorId: socket.id,
       canvasData: []
     })
     router.push(`/docs/${roomId}?admin=${socket.id}`)
   }, [router])
 
   const joinRoomRequest = useCallback(() => {
-    const roomId = input.current?.value
-    if (roomId) {
+
+    const { AuthorId, roomId } = queryString.parse(input.current?.value as string)
+
+    if (roomId && profile.user?._id && AuthorId) {
       socket.emit("sketch_room_join_req_sender", {
         roomId: roomId,
         userId: profile.user?._id,
         userData: profile.user,
         socketId: socket.id,
-        adminId: AdminId.current?.value
+        AuthorId: AuthorId
       })
     }
   }, [profile.user?._id, router])
@@ -69,14 +71,6 @@ function DocsHome() {
             Play painting game with your friends
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-6">
-          <div className="grid gap-2">
-            <Label htmlFor="AdminId">Room AdminId</Label>
-            <Input id="AdminId" placeholder="Enter room code here"
-              ref={AdminId}
-            />
-          </div>
-        </CardContent>
         <CardContent className="grid gap-6">
           <div className="grid gap-2">
             <Label htmlFor="roomId">Room Code</Label>

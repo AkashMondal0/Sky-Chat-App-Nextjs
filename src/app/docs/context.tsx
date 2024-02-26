@@ -27,6 +27,7 @@ interface SketchContextProps {
     setTool?: React.Dispatch<React.SetStateAction<toolProps>>,
     sendMyCanvas?: (canvasData: any) => void
     JoinRoomWithAllData?: (data: RoomDataState) => void
+    roomData?: RoomDataState | undefined
 }
 export const SketchContext = createContext<SketchContextProps>({
     canvas: React.createRef<ReactSketchCanvasRef>(),
@@ -36,7 +37,8 @@ export const SketchContext = createContext<SketchContextProps>({
     profileState: undefined,
     setTool: () => { },
     sendMyCanvas: () => { },
-    JoinRoomWithAllData: () => { }
+    JoinRoomWithAllData: () => { },
+    roomData: undefined
 })
 
 
@@ -173,7 +175,8 @@ export function SketchProvider({ children }: SketchProviderProps) {
             profileState,
             setTool,
             sendMyCanvas: throttledFunction,
-            JoinRoomWithAllData
+            JoinRoomWithAllData,
+            roomData
         }}>
         <AlertDialogDemo
             open={tool.alert.open}

@@ -6,7 +6,7 @@ import { ModeToggle } from '@/components/shared/ToggleTheme';
 import { PrivateChat, User } from '@/interface/type';
 import { Button } from '@/components/ui/button';
 import { CopyIcon, LogOutIcon, Share2Icon } from 'lucide-react';
-import { toolProps } from '../../reducer';
+import { RoomDataState, toolProps } from '../../reducer';
 import { Members_Sketch } from '../page';
 import { DropDown } from './components';
 import MyAvatar from '@/components/shared/MyAvatar';
@@ -16,13 +16,15 @@ interface HeaderProps {
     data: toolProps
     members: Members_Sketch[]
     profileState?: User | null | undefined
+    roomData?: RoomDataState
 }
 
 const Header: FC<HeaderProps> = ({
     toggleScreen,
     data,
     members,
-    profileState
+    profileState,
+    roomData
 }) => {
 
     const handleGameRequest = async (e: string) => {
@@ -42,7 +44,7 @@ const Header: FC<HeaderProps> = ({
                 {/* navigation */}
                 <div className='flex gap-2'>
                     <DropDown data={members} profileState={profileState} />
-                    <DialogShareButton data={""}>
+                    <DialogShareButton data={`roomId=${roomData?.roomId}&&AuthorId=${roomData?.AuthorId}`}>
                         <Button>
                             <Share2Icon className="mr-2 h-4 w-4" />
                             Share
@@ -76,14 +78,25 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { toast } from 'sonner';
 
 export function DialogShareButton({
     children,
     data
 }: {
     children: React.ReactNode
-    data:string
+    data: string
 }) {
+
+    function myFunction() {
+        // Copy Text to Clipboard
+        const copyText = document.getElementById("link") as HTMLInputElement;
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+        document.execCommand("copy");
+        toast.success('Link Copied');
+    }
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -107,10 +120,13 @@ export function DialogShareButton({
                             readOnly
                         />
                     </div>
-                    <Button type="submit" size="sm" className="px-3">
-                        <span className="sr-only">Copy</span>
-                        <CopyIcon className="h-4 w-4" />
-                    </Button>
+                    <DialogClose asChild>
+
+                        <Button type="submit" size="sm" className="px-3" onClick={myFunction}>
+                            <span className="sr-only">Copy</span>
+                            <CopyIcon className="h-4 w-4" />
+                        </Button>
+                    </DialogClose>
                 </div>
                 <DialogFooter className="sm:justify-start">
                     <DialogClose asChild>

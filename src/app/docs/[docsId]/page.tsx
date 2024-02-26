@@ -37,7 +37,8 @@ export default function PlaygroundPage() {
     toggleScreen,
     profileState,
     setTool,
-    sendMyCanvas
+    sendMyCanvas,
+    roomData
   } = useContext(SketchContext);
 
   return (
@@ -45,7 +46,7 @@ export default function PlaygroundPage() {
       <Header
         profileState={profileState}
         toggleScreen={toggleScreen}
-        data={tool} members={members} />
+        data={tool} members={members} roomData={roomData}/>
       <ResizableWindow
         toggle={tool.toggle}
         children2={<div className='w-full h-screen'></div>}>
