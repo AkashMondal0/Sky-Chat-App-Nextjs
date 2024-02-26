@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 import { socket } from "@/lib/socket"
 import { RootState } from "@/redux/store"
@@ -28,6 +27,7 @@ interface SketchContextProps {
     sendMyCanvas?: (canvasData: any) => void
     JoinRoomWithAllData?: (data: RoomDataState) => void
     roomData?: RoomDataState | undefined
+    loadCanvas?: () => void
 }
 export const SketchContext = createContext<SketchContextProps>({
     canvas: React.createRef<ReactSketchCanvasRef>(),
@@ -38,7 +38,8 @@ export const SketchContext = createContext<SketchContextProps>({
     setTool: () => { },
     sendMyCanvas: () => { },
     JoinRoomWithAllData: () => { },
-    roomData: undefined
+    roomData: undefined,
+    loadCanvas: () => { }
 })
 
 
@@ -48,6 +49,11 @@ export function SketchProvider({ children }: SketchProviderProps) {
     const canvas = React.useRef<ReactSketchCanvasRef>(null);
     const [tool, setTool] = useReducer(reducer, initialToolState)
     const [roomData, setRoomData] = useReducer(roomReducer, initialRoomDataState)
+    const [saveCanvas, setSaveCanvas] = useState<any>([])
+
+    const loadCanvas = useCallback(() => {
+        canvas.current?.loadPaths(saveCanvas);
+    }, [saveCanvas])
 
     // sketch room join request alert 
     const NewRequestAlert = useCallback((user: User, socketId: string, roomId: string) => {
@@ -65,16 +71,17 @@ export function SketchProvider({ children }: SketchProviderProps) {
             roomId: data.roomId,
             userData: profileState
         })
+        setSaveCanvas(data.canvasData)
         setRoomData({ type: "SET_ROOM_DATA", payload: roomData })
         router.push(`/docs/${data.roomId}?admin=${data.AuthorId}`)
     }, [profileState, router])
 
-    const acceptRequest = useCallback(() => {
+    const acceptRequest = useCallback(async () => {
         const Members = [...roomData.members, { user: tool.alert.data.user, canvasData: [] }]
         const roomAllData = {
             AuthorId: socket.id,
             members: Members,
-            canvasData: [],
+            canvasData: await canvas.current?.exportPaths(),
             receiverId: tool.alert.data.socketId,
             roomId: tool.alert.data.roomId,
             type: "ACCEPTED"
@@ -99,8 +106,7 @@ export function SketchProvider({ children }: SketchProviderProps) {
         setTool({ type: "TOGGLE", payload: screen })
     }
 
-    const sendMyCanvas = (canvasData: any) => {
-        // console.log(canvasData, 'canvasData')
+    const sendMyCanvas = async (canvasData: any) => {
         socket.emit('sketch_room_load_canvas_data_sender', {
             canvasData: canvasData,
             roomId: roomData.roomId,
@@ -165,7 +171,7 @@ export function SketchProvider({ children }: SketchProviderProps) {
         }
     }, [])
 
-
+    // console.log(saveCanvas, 'saveCanvas')
     return <SketchContext.Provider
         value={{
             canvas,
@@ -176,7 +182,8 @@ export function SketchProvider({ children }: SketchProviderProps) {
             setTool,
             sendMyCanvas: throttledFunction,
             JoinRoomWithAllData,
-            roomData
+            roomData,
+            loadCanvas
         }}>
         <AlertDialogDemo
             open={tool.alert.open}

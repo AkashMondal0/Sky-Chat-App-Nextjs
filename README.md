@@ -20,15 +20,17 @@ This is a real time chat application developed using Nextjs and Nodejs. It has f
 - User authentication with JWT and bcrypt
 - Real time chat using Socket io
 - Image uploading feature with Multer
-- Group real chat feature
 - Share Status with your friends
 - Light/dark mode toggle
 - Application is fully responsive
-
+- Realtime Sketch with friends
+<!-- - Group real chat feature -->
 ## Screenshot
 
 ![App Screenshot](/public/image.png)
 <!-- ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here) -->
+## Realtime Sketch Video
+[![Watch the video](/public/github.mp4)](/public/github.mp4)
 
 
 ## Quick start with  Docker image

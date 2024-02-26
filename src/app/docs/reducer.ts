@@ -73,7 +73,9 @@ const initialRoomDataState: RoomDataState = {
 const roomReducer = (state: RoomDataState, action: any) => {
     switch (action.type) {
         case "SET_MEMBERS":
-            return { ...state, members: action.payload }
+            // remove duplicate members 
+            const members = action.payload.filter((v: Members_Sketch, i: number, a: Members_Sketch[]) => a.findIndex(t => (t.user?._id === v.user?._id)) === i)
+            return { ...state, members }
         case "UPDATE_ROOM_ID":
             return { ...state, roomId: action.payload }
         case "SET_ROOM_DATA":

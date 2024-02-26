@@ -2,7 +2,7 @@
 'use client'
 
 import { ReactSketchCanvas } from 'react-sketch-canvas';
-import React, {  useContext,  } from "react"
+import React, { useContext, useEffect, } from "react"
 import Header from './components/header';
 import { Button } from '@/components/ui/button';
 import { PencilRuler } from 'lucide-react';
@@ -38,15 +38,19 @@ export default function PlaygroundPage() {
     profileState,
     setTool,
     sendMyCanvas,
-    roomData
+    roomData,
+    loadCanvas,
   } = useContext(SketchContext);
 
+  useEffect(() => {
+    loadCanvas?.()
+  }, [])
   return (
     <div>
       <Header
         profileState={profileState}
         toggleScreen={toggleScreen}
-        data={tool} members={members} roomData={roomData}/>
+        data={tool} members={members} roomData={roomData} />
       <ResizableWindow
         toggle={tool.toggle}
         children2={<div className='w-full h-screen'></div>}>
@@ -60,7 +64,7 @@ export default function PlaygroundPage() {
             </ToolDialog>
             <SideButtons
               onPencil={() => canvas.current?.eraseMode(false)}
-              onUndo={() => {canvas.current?.undo()}}
+              onUndo={() => { canvas.current?.undo() }}
               onRedo={() => canvas.current?.redo()}
               onClear={() => canvas.current?.clearCanvas()}
               onEase={() => canvas.current?.eraseMode(true)}
