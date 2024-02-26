@@ -17,6 +17,7 @@ import {
 import { Members_Sketch } from "../page"
 import MyAvatar from "@/components/shared/MyAvatar"
 import { User } from "@/interface/type"
+import { Users2Icon } from "lucide-react"
 
 export function MyTooltip({
   children,
@@ -44,22 +45,31 @@ export function DropDown({
   profileState
 }: {
   data: Members_Sketch[]
-  profileState?:User | null | undefined
+  profileState?: User | null | undefined
 }) {
   return (
     <Select>
       <SelectTrigger className="w-[180px] p-2 h-12">
-        <MyAvatar src={profileState?.profilePicture||""} alt={profileState?.username||""} />
-        <p className="text-base">{profileState?.username}</p>
+        <div className="flex">
+          {data
+            .slice(0, 3)
+              .map((item, index) => {
+                return (
+                  <div className={`relative right-${3 * index}`} key={index}>
+                    <MyAvatar src={item.user?.profilePicture || ""} alt={item.user?.username || ""} />
+                  </div>
+                )})}
+        </div>
+        <Users2Icon />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Members</SelectLabel>
           {data?.map((item, index) => (
-            <SelectItem key={index} value={item.user?._id as string}>
-              <MyAvatar src={item.user?.profilePicture||""} alt={item.user?.username||""} />
+            <div className="flex items-center p-2 gap-3 w-full" key={index}>
+              <MyAvatar src={item.user?.profilePicture || ""} alt={item.user?.username || ""} />
               {item.user?.username}
-            </SelectItem>
+            </div>
           ))}
         </SelectGroup>
       </SelectContent>

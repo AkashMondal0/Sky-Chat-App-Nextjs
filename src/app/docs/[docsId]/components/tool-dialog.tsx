@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/lib/utils"
 import { useCallback, useRef } from "react"
-import { toolProps } from "../reducer"
+import { toolProps } from "../../reducer"
 
 export default function ToolDialog(
     {

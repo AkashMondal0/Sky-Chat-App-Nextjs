@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,30 +19,30 @@ function DocsHome() {
   const router = useRouter()
   const profile = useSelector((state: RootState) => state.Profile_Slice)
   const input = useRef<HTMLInputElement>(null)
+  const AdminId = useRef<HTMLInputElement>(null)
 
   const createNewPlayRoom = useCallback(() => {
     const roomId = uid()
     socket.emit("sketch_create_room_sender", {
       roomId: roomId,
-      userId: profile.user?._id,
-      socketId: socket.id
     })
-    router.push(`/docs/${roomId}`)
-  }, [router, profile.user?._id])
+    router.push(`/docs/${roomId}?admin=${socket.id}`)
+  }, [router])
 
   const joinRoom = useCallback(() => {
     const roomId = input.current?.value
     if (roomId) {
-      socket.emit("sketch_create_room_sender", {
+      socket.emit("sketch_room_join_req_sender", {
         roomId: roomId,
         userId: profile.user?._id,
-        socketId: socket.id
+        userData: profile.user,
+        socketId: socket.id,
+        adminId: AdminId.current?.value
       })
-      router.push(`/docs/${roomId}`)
     }
   }, [profile.user?._id, router])
 
-
+  
 
   return (
     <div className="w-full min-h-screen justify-center items-center flex gap-10 flex-wrap p-2">
@@ -56,6 +57,14 @@ function DocsHome() {
             Play painting game with your friends
           </CardDescription>
         </CardHeader>
+        <CardContent className="grid gap-6">
+          <div className="grid gap-2">
+            <Label htmlFor="AdminId">Room AdminId</Label>
+            <Input id="AdminId" placeholder="Enter room code here" 
+              ref={AdminId}
+            />
+          </div>
+        </CardContent>
         <CardContent className="grid gap-6">
           <div className="grid gap-2">
             <Label htmlFor="roomId">Room Code</Label>

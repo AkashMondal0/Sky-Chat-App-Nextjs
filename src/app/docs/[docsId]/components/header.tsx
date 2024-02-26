@@ -6,9 +6,10 @@ import { ModeToggle } from '@/components/shared/ToggleTheme';
 import { PrivateChat, User } from '@/interface/type';
 import { Button } from '@/components/ui/button';
 import { LogOutIcon, Share2Icon } from 'lucide-react';
-import { toolProps } from '../reducer';
+import { toolProps } from '../../reducer';
 import { Members_Sketch } from '../page';
 import { DropDown } from './components';
+import MyAvatar from '@/components/shared/MyAvatar';
 
 interface HeaderProps {
     toggleScreen: (screen: "document" | "Both" | "Canvas") => void;
@@ -32,7 +33,7 @@ const Header: FC<HeaderProps> = ({
         <div className={cn("w-full h-[4rem]")}>
             <div className="flex justify-between items-center h-full w-full">
                 {/* logo */}
-                <>logo</>
+               <div className='mx-2'><MyAvatar src={"/logo.png"} alt={'logo'} size='50'/></div>
                 <div>
                     <Button variant={data.toggle === "document" ? "default" : "outline"} onClick={() => handleGameRequest("document")}>Document</Button>
                     <Button variant={data.toggle === "Both" ? "default" : "outline"} onClick={() => handleGameRequest("Both")}>Both</Button>

@@ -1,3 +1,5 @@
+import { Members_Sketch } from "./[docsId]/page";
+
 export interface toolProps {
     StrokeWidth: number;
     PenColor: string;
