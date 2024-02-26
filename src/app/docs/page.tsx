@@ -9,8 +9,9 @@ import uid from "@/lib/uuid"
 import { RootState } from "@/redux/store"
 import { PlusCircleIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useCallback, useRef } from "react"
+import { useCallback, useContext, useRef } from "react"
 import { useSelector } from "react-redux"
+import { SketchContext } from "./context"
 
 
 
@@ -20,16 +21,27 @@ function DocsHome() {
   const profile = useSelector((state: RootState) => state.Profile_Slice)
   const input = useRef<HTMLInputElement>(null)
   const AdminId = useRef<HTMLInputElement>(null)
+  const sketchState = useContext(SketchContext)
 
   const createNewPlayRoom = useCallback(() => {
     const roomId = uid()
     socket.emit("sketch_create_room_sender", {
       roomId: roomId,
     })
+    if (!profile.user) return
+    sketchState.JoinRoomWithAllData?.({
+      members: [{
+        user: profile.user,
+        canvasData: []
+      }],
+      roomId: roomId,
+      AuthorId: profile.user?._id as string,
+      canvasData: []
+    })
     router.push(`/docs/${roomId}?admin=${socket.id}`)
   }, [router])
 
-  const joinRoom = useCallback(() => {
+  const joinRoomRequest = useCallback(() => {
     const roomId = input.current?.value
     if (roomId) {
       socket.emit("sketch_room_join_req_sender", {
@@ -42,7 +54,7 @@ function DocsHome() {
     }
   }, [profile.user?._id, router])
 
-  
+
 
   return (
     <div className="w-full min-h-screen justify-center items-center flex gap-10 flex-wrap p-2">
@@ -60,7 +72,7 @@ function DocsHome() {
         <CardContent className="grid gap-6">
           <div className="grid gap-2">
             <Label htmlFor="AdminId">Room AdminId</Label>
-            <Input id="AdminId" placeholder="Enter room code here" 
+            <Input id="AdminId" placeholder="Enter room code here"
               ref={AdminId}
             />
           </div>
@@ -68,14 +80,14 @@ function DocsHome() {
         <CardContent className="grid gap-6">
           <div className="grid gap-2">
             <Label htmlFor="roomId">Room Code</Label>
-            <Input id="roomId" placeholder="Enter room code here" 
+            <Input id="roomId" placeholder="Enter room code here"
               ref={input}
             />
           </div>
         </CardContent>
         <CardFooter className="justify-between space-x-2">
           <Button variant="ghost">Cancel</Button>
-          <Button onClick={joinRoom}>Join Room</Button>
+          <Button onClick={joinRoomRequest}>Join Room</Button>
         </CardFooter>
       </Card>
     </div>

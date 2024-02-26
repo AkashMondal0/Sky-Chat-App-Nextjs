@@ -7,23 +7,26 @@ import { createContext } from "react"
 import { useSelector } from "react-redux"
 import { ReactSketchCanvasRef } from "react-sketch-canvas"
 import { Members_Sketch } from "./[docsId]/page"
-import { initialToolState, reducer, toolProps } from "./reducer"
-import { AvatarToast, GameRequestToast } from "@/components/shared/MyAlert"
+import { RoomDataState, initialRoomDataState, initialToolState, reducer, roomReducer, toolProps } from "./reducer"
 import { toast } from "sonner"
 import { User, UserType } from "@/interface/type"
 import { redirect, useRouter } from "next/navigation"
 import { AlertDialogDemo } from "./[docsId]/components/alert-dialog"
+import _ from "lodash"
 
 interface SketchProviderProps {
     children: React.ReactNode
 }
+
 interface SketchContextProps {
     canvas: React.RefObject<ReactSketchCanvasRef>
     tool: toolProps
     members: Members_Sketch[]
     profileState?: UserType | null | undefined
     toggleScreen: (screen: "document" | "Both" | "Canvas") => void
-    setTool?: React.Dispatch<React.SetStateAction<toolProps>>
+    setTool?: React.Dispatch<React.SetStateAction<toolProps>>,
+    sendMyCanvas?: (canvasData: any) => void
+    JoinRoomWithAllData?: (data: RoomDataState) => void
 }
 export const SketchContext = createContext<SketchContextProps>({
     canvas: React.createRef<ReactSketchCanvasRef>(),
@@ -31,7 +34,9 @@ export const SketchContext = createContext<SketchContextProps>({
     members: [],
     toggleScreen: () => { },
     profileState: undefined,
-    setTool: () => { }
+    setTool: () => { },
+    sendMyCanvas: () => { },
+    JoinRoomWithAllData: () => { }
 })
 
 
@@ -40,22 +45,69 @@ export function SketchProvider({ children }: SketchProviderProps) {
     const profileState = useSelector((state: RootState) => state.Profile_Slice.user);
     const canvas = React.useRef<ReactSketchCanvasRef>(null);
     const [tool, setTool] = useReducer(reducer, initialToolState)
-    const [members, setMembers] = useState<Members_Sketch[]>([])
-    const [alert, setAlert] = useState<{
-        open: boolean,
-        data: {
-            user: User | null,
-            socketId: string | null,
-            roomId: string | null
+    const [roomData, setRoomData] = useReducer(roomReducer, initialRoomDataState)
+
+    // sketch room join request alert 
+    const NewRequestAlert = useCallback((user: User, socketId: string, roomId: string) => {
+        setTool({ type: "ALERT", payload: { open: true, data: { user, socketId, roomId } } })
+    }, [])
+    const JoinRoomWithAllData = useCallback((data: RoomDataState) => {
+        // TODO set all data
+        const roomData = {
+            members: data.members,
+            canvasData: [],
+            roomId: data.roomId,
+            AuthorId: data.AuthorId
         }
-    }>({
-        open: false,
-        data: {
-            user: null,
-            socketId: null,
-            roomId: null
+        socket.emit('sketch_create_room_sender', {
+            roomId: data.roomId,
+            userData: profileState
+        })
+        setRoomData({ type: "SET_ROOM_DATA", payload: roomData })
+        router.push(`/docs/${data.roomId}?admin=${data.AuthorId}`)
+    }, [profileState, router])
+
+    const acceptRequest = useCallback(() => {
+        const Members = [...roomData.members, { user: tool.alert.data.user, canvasData: [] }]
+        const roomAllData = {
+            AuthorId: socket.id,
+            members: Members,
+            canvasData: [],
+            receiverId: tool.alert.data.socketId,
+            roomId: tool.alert.data.roomId,
+            type: "ACCEPTED"
         }
-    })
+        socket.emit('sketch_room_join_answer_sender', roomAllData);
+        setRoomData({ type: "SET_MEMBERS", payload: Members })
+        setTool({ type: "ALERT", payload: { open: false, data: { user: null, socketId: null, roomId: null } } })
+    }, [roomData.members, tool.alert.data.roomId, tool.alert.data.socketId, tool.alert.data.user])
+
+    const declineRequest = useCallback(() => {
+        const roomAllData = {
+            receiverId: tool.alert.data.socketId,
+            type: "DECLINED"
+        }
+        socket.emit('sketch_room_join_answer_sender', roomAllData);
+        setTool({ type: "ALERT", payload: { open: false, data: { user: null, socketId: null, roomId: null } } })
+    }, [tool.alert.data.socketId])
+
+    // TODO: Add the following pointer
+
+    const toggleScreen = (screen: "document" | "Both" | "Canvas") => {
+        setTool({ type: "TOGGLE", payload: screen })
+    }
+
+    const sendMyCanvas = (canvasData: any) => {
+        // console.log(canvasData, 'canvasData')
+        socket.emit('sketch_room_load_canvas_data_sender', {
+            canvasData: canvasData,
+            roomId: roomData.roomId,
+            userId: profileState?._id
+        })
+    }
+
+    const throttledFunction = _.throttle((canvasData) => sendMyCanvas(canvasData), 1000);
+
 
     useEffect(() => {
         function handleResize() {
@@ -72,34 +124,16 @@ export function SketchProvider({ children }: SketchProviderProps) {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    function findUserDetails(user: User, socketId: string, roomId: string) {
-        setAlert({
-            open: true,
-            data: {
-                user,
-                socketId,
-                roomId
-            }
-        })
-    }
-
     useEffect(() => {
         if (!profileState) {
             redirect('/docs')
-        } else {
-            setMembers([{ user: profileState, canvasData: [] }])
         }
-        socket.on('sketch_in_room_sender', (data) => {
-            console.log(data, 'data')
-            canvas.current?.loadPaths(data);
-        })
-
         socket.on('sketch_user_join_Broadcast_room_receiver', (data) => {
             toast.success(`${data.userData.username} joined the room`)
         })
 
         socket.on('sketch_room_join_req_receiver', (data) => {
-            findUserDetails(data.userData, data.socketId, data.roomId);
+            NewRequestAlert(data.userData, data.socketId, data.roomId);
         })
 
         socket.on('following_pointer_receiver', (data) => {
@@ -110,18 +144,18 @@ export function SketchProvider({ children }: SketchProviderProps) {
             if (data.type === "DECLINED") {
                 toast.error("Room join request declined")
             } else if (data.type === "ACCEPTED") {
-                // TODO set all data
-                setMembers(data.members)
-                socket.emit('sketch_create_room_sender', {
-                    roomId: data.roomId,
-                    userData: profileState
-                })
-                router.push(`/docs/${data.roomId}?admin=${data.AuthorId}`)
+                JoinRoomWithAllData(data)
             }
         })
 
+        // TODO: Load the canvas data
+        socket.on('sketch_room_load_canvas_data_receiver', (data) => {
+            canvas.current?.loadPaths(data?.canvasData);
+        })
+
+
         return () => {
-            socket.off('sketch_in_room_sender');
+            socket.off('sketch_room_load_canvas_data_receiver');
             socket.off('sketch_room_join_req_receiver');
             socket.off('following_pointer_receiver');
             socket.off('sketch_room_join_answer_receiver');
@@ -129,44 +163,23 @@ export function SketchProvider({ children }: SketchProviderProps) {
         }
     }, [])
 
-    const toggleScreen = (screen: "document" | "Both" | "Canvas") => {
-        setTool({ type: "TOGGLE", payload: screen })
-    }
 
     return <SketchContext.Provider
         value={{
             canvas,
             tool,
-            members,
+            members: roomData.members,
             toggleScreen,
             profileState,
-            setTool
+            setTool,
+            sendMyCanvas: throttledFunction,
+            JoinRoomWithAllData
         }}>
         <AlertDialogDemo
-            open={alert.open}
-            accept={() => {
-                const Members = [...members, { user: alert.data.user, canvasData: [] }]
-                const roomAllData = {
-                    AuthorId: socket.id,
-                    members: Members,
-                    canvasData: [],
-                    receiverId: alert.data.socketId,
-                    roomId: alert.data.roomId,
-                    type: "ACCEPTED"
-                }
-                setMembers(Members as Members_Sketch[])
-                socket.emit('sketch_room_join_answer_sender', roomAllData);
-                setAlert({ ...alert, open: false })
-            }}
-            decline={() => {
-                const roomAllData = {
-                    receiverId: alert.data.socketId,
-                    type: "DECLINED"
-                }
-                socket.emit('sketch_room_join_answer_sender', roomAllData);
-                setAlert({ ...alert, open: false })
-            }}
-            data={alert.data.user}
+            open={tool.alert.open}
+            accept={acceptRequest}
+            decline={declineRequest}
+            data={tool.alert.data.user}
         />
         {children}
     </SketchContext.Provider>
