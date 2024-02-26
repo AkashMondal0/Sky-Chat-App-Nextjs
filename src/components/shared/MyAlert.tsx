@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { GameRequest } from "@/interface/type"
+import { GameRequest, User } from "@/interface/type"
 
 const GameRequestToast =  ({
   data,
@@ -37,6 +37,22 @@ const GameRequestToast =  ({
   </Card>
 }
 
+const AvatarToast =  ({
+  data,
+}: {
+  data?: User,
+}) => {
+
+  return <Card className="w-96 h-20 flex justify-around items-center px-2">
+    <MyAvatar src={data?.profilePicture || ""} size="40px" alt={`${data?.username}`} />
+    <div className="flex flex-col justify-center items-start">
+      <p className="text-sm font-semibold">{data?.username}</p>
+      <p className="text-xs text-gray-500">You have a new message from {data?.username}</p>
+    </div>
+  </Card>
+}
+
 export {
-  GameRequestToast
+  GameRequestToast,
+  AvatarToast
 }

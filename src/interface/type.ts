@@ -60,6 +60,7 @@ export interface typingState {
 
 }
 
+
 export interface User {
     _id: string;
     username: string;
@@ -81,6 +82,27 @@ export interface User {
     isOnline?: boolean;
 }
 
+export interface UserType {
+    _id: string;
+    username: string;
+    email: string;
+    password: string;
+    profilePicture?: string;
+    coverPicture?: string;
+    followers?: string[];
+    followings?: string[];
+    privateIds?: string[];
+    groupIds?: string[];
+    bio?: string;
+    city?: string;
+    from?: string;
+    updatedAt?: string;
+    createdAt?: string;
+    themes?: CurrentTheme[]
+    status?: Status[];
+    isOnline?: boolean;
+    socketId?: string;
+}
 export interface Status {
     _id: string,
     url: string,
