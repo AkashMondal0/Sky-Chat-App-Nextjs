@@ -60,13 +60,9 @@ function DocsHome() {
 
   return (
     <div className="w-full min-h-screen justify-center items-center flex gap-10 flex-wrap p-2">
-      <Card className="w-96 h-60" onClick={createNewPlayRoom}>
-        <PlusCircleIcon className="m-auto h-60" size={100} />
-      </Card>
-
-      <Card className="w-96 h-60">
+      <Card className="w-96">
         <CardHeader>
-          <CardTitle>Painting Room</CardTitle>
+          <CardTitle>Sketch Room</CardTitle>
           <CardDescription>
             Play painting game with your friends
           </CardDescription>
@@ -80,7 +76,7 @@ function DocsHome() {
           </div>
         </CardContent>
         <CardFooter className="justify-between space-x-2">
-          <Button variant="ghost">Cancel</Button>
+          <Button variant="outline" onClick={createNewPlayRoom}>Create Room</Button>
           <Button onClick={joinRoomRequest}>Join Room</Button>
         </CardFooter>
       </Card>

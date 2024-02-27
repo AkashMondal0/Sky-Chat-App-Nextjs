@@ -11,6 +11,7 @@ interface AlertSketchRoom {
 }
 export interface toolProps {
     StrokeWidth: number;
+    StrokeEraser: number;
     PenColor: string;
     width: number;
     height: number;
@@ -22,11 +23,12 @@ export interface toolProps {
 
 const initialToolState: toolProps = {
     StrokeWidth: 4,
+    StrokeEraser: 10,
     PenColor: "black",
     width: 0,
     height: 0,
     canvasBackground: "white",
-    toggle: "Both",
+    toggle: "Canvas",
     alert: {
         open: false,
         data: {
@@ -51,6 +53,8 @@ const reducer = (state: toolProps, action: any) => {
             return { ...state, toggle: action.payload }
         case "ALERT":
             return { ...state, alert: action.payload }
+        case "ERASER_SIZE":
+            return { ...state, StrokeEraser: action.payload }
         default:
             return state
     }

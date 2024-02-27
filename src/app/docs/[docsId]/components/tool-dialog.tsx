@@ -38,6 +38,9 @@ export default function ToolDialog(
         dispatch({ type: "STROKE_WIDTH", payload: size })
     }, [dispatch])
 
+    const sizeChangeEraser = useCallback((size: string) => {
+        dispatch({ type: "ERASER_SIZE", payload: size })
+    }, [dispatch])
 
     return (
         <Dialog>
@@ -64,7 +67,7 @@ export default function ToolDialog(
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="username" className="text-right">
-                            Size
+                           Size
                         </Label>
                         <input type="range" min="1" max="15" step={1}
                             defaultValue={4}

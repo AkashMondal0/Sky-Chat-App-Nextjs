@@ -16,19 +16,19 @@ function SideButtons({
     }) {
     return <>
       <div className="flex flex-col items-center justify-center w-full h-full gap-2 mt-2">
-      <Button variant="secondary" onClick={onPencil}>
+      <Button variant="secondary" className="rounded-full" onClick={onPencil}>
         <Pencil />
         </Button>
-        <Button variant="secondary" onClick={onUndo}>
+        <Button variant="secondary" className="rounded-full" onClick={onUndo}>
         <Undo />
         </Button>
-        <Button variant="secondary" onClick={onRedo}>
+        <Button variant="secondary" className="rounded-full" onClick={onRedo}>
         <Redo />
         </Button>
-        <Button variant="secondary" onClick={onClear}>
+        <Button variant="secondary" className="rounded-full" onClick={onClear}>
         <RotateCcw />
         </Button>
-        <Button variant="secondary" onClick={onEase}>
+        <Button variant="secondary" className="rounded-full" onClick={onEase}>
         <Eraser />
         </Button>
       </div>

@@ -56,9 +56,9 @@ export default function PlaygroundPage() {
         children2={<div className='w-full h-screen'></div>}>
         <div className="relative justify-center w-full h-full gap-4">
           {/* // action button div */}
-          <div className='absolute top-2 left-2'>
+          <div className='absolute top-2 left-1'>
             <ToolDialog data={tool} dispatch={setTool}>
-              <Button variant="secondary" className=' rounded-md'>
+              <Button variant="secondary" className='rounded-full'>
                 <PencilRuler />
               </Button>
             </ToolDialog>
@@ -77,7 +77,7 @@ export default function PlaygroundPage() {
             onStroke={(canvasData: CanvasPath | any) => {
               sendMyCanvas?.(canvasData)
             }}
-            className='w-full h-full'
+            className='w-full h-full cursor-crosshair'
             allowOnlyPointerType="all"
             strokeWidth={tool.StrokeWidth}
             canvasColor={tool.canvasBackground}

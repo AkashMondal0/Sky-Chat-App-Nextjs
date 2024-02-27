@@ -35,14 +35,14 @@ const Header: FC<HeaderProps> = ({
         <div className={cn("w-full h-[4rem]")}>
             <div className="flex justify-between items-center h-full w-full">
                 {/* logo */}
-                <div className='mx-2'><MyAvatar src={"/logo.png"} alt={'logo'} size='50' /></div>
-                <div>
+                <div className='px-2'><MyAvatar src={"/logo.png"} alt={'logo'} size='50' /></div>
+                <div className='gap-2 md:flex hidden'>
                     <Button variant={data.toggle === "document" ? "default" : "outline"} onClick={() => handleGameRequest("document")}>Document</Button>
                     <Button variant={data.toggle === "Both" ? "default" : "outline"} onClick={() => handleGameRequest("Both")}>Both</Button>
                     <Button variant={data.toggle === "Canvas" ? "default" : "outline"} onClick={() => handleGameRequest("Canvas")}>Canvas</Button>
                 </div>
                 {/* navigation */}
-                <div className='flex gap-2'>
+                <div className='gap-2 flex px-2 items-center'>
                     <DropDown data={members} profileState={profileState} />
                     <DialogShareButton data={`roomId=${roomData?.roomId}&&AuthorId=${roomData?.AuthorId}`}>
                         <Button>
@@ -50,16 +50,9 @@ const Header: FC<HeaderProps> = ({
                             Share
                         </Button>
                     </DialogShareButton>
-                    {/* <ModeToggle />
-                    <Button variant={"link"}>
-                        <Share2Icon className="mr-2 h-4 w-4" />
-                        Invite
-                    </Button>
-                    <Button>
-                        <LogOutIcon className="mr-2 h-4 w-4" />
-                        Leave
-                    </Button> */}
+                    <ModeToggle />
                 </div>
+                
             </div>
         </div>
     );
