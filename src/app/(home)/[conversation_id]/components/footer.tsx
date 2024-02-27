@@ -100,12 +100,13 @@ const ChatFooter: FC<ChatFooterProps> = ({
 
 
     return (
-        <div className={cn("w-full border-t items-center p-2 h-20 my-auto max-h-20")}>
-            <form onSubmit={handleSubmit(sendMessageHandle)} className="flex w-full items-center dark:bg-neutral-700 mt-2
+        <div className={cn("w-full border-t items-center p-2 h-20 my-auto max-h-20 flex gap-2")}>
+            <form onSubmit={handleSubmit(sendMessageHandle)} className="flex w-full items-center dark:bg-neutral-900
                 bg-neutral-200 dark:text-neutral-100 text-neutral-800 rounded-xl">
                 <input
                     id='message-input'
-                    className='outline-none focus:none bg-transparent w-full p-2'
+                    className='outline-none focus:none bg-transparent w-full p-2
+                    dark:placeholder-neutral-100 placeholder-neutral-800'
                     type="text" placeholder="send a message"
 
                     {...register("message", {
@@ -124,12 +125,12 @@ const ChatFooter: FC<ChatFooterProps> = ({
                         },
                     })}
                 />
+            </form>
                 <Button type="submit"
                     onClick={handleSubmit(sendMessageHandle)}
-                    variant={"ghost"} className='rounded-xl'>
+                    variant={"outline"} className='rounded-xl'>
                     <Send />
                 </Button>
-            </form>
         </div>
     );
 };

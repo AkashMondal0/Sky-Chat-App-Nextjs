@@ -16,7 +16,13 @@ import { Profile_State } from "@/redux/slices/profile";
 import React from "react";
 import dynamic from 'next/dynamic'
 import { usePathname, useRouter } from "next/navigation";
-
+import { PrivateChat, PrivateMessage } from "@/interface/type";
+interface CardList {
+    type: "private" | "group"
+    item: PrivateChat
+    // GroupConversation
+    name?: string
+}
 interface SidebarProps {
     ConversationState: Private_Chat_State
     ProfileState: Profile_State
@@ -34,19 +40,42 @@ const UserNav = dynamic(() => import('./user-nav'), {
 export default function Sidebar({ ConversationState,
     ProfileState }: SidebarProps) {
     const router = useRouter()
-    const asPath = usePathname()
 
-    const ArrangeDateByeDate = useMemo(() => {
-        return ConversationState.List
-    }, [ConversationState.List])
+    const margeList: CardList[] = useMemo(() => {
+        // marge group and private chat list
+        const privateList = [...ConversationState.List].map((item) => {
+            return {
+                type: "private",
+                item,
+                name: item.userDetails?.username
+            }
+        })
+        // const groupList = [...useGroupChat.groupChatList].map((item) => {
+        //     return {
+        //         type: "group",
+        //         item,
+        //         name: item.name
+        //     }
+        // })
 
-    const navigateToPage = useCallback((id?: string) => {
-        if (asPath !== "/") {
-            router.replace(`/${id}`)
-        } else {
-            router.push(`/${id}`)
+        const sortedNewDate = (messages: PrivateMessage[]) => {
+            return messages && [...messages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]?.createdAt
         }
-    }, [])
+
+        return [...privateList,
+            // ...groupList
+        ].sort((a, b) => {
+            const _a = a.item.messages && a.item.messages?.length > 0 ? sortedNewDate(a.item.messages) : a.item.createdAt
+            const _b = b.item.messages && b.item.messages?.length > 0 ? sortedNewDate(b.item.messages) : b.item.createdAt
+            return new Date(_b).getTime() - new Date(_a).getTime()
+        })
+        // search filter
+        // .filter((item) => {
+        //     return item.name?.toLowerCase().includes(watch("search").toLowerCase()) || ""
+        // })
+    }, [ConversationState.List,]) as CardList[]
+
+
 
     return (
         <div>
@@ -63,27 +92,24 @@ export default function Sidebar({ ConversationState,
                                 {/* <GroupCreateModal /> */}
                             </div>
                             <div>
-                            <Button variant={"ghost"} onClick={() => {
-                               
-                            }}>
-                                <Bell className='w-6 h-6 cursor-pointer' />
-                            </Button>
-                            <Button variant={"ghost"} onClick={() => {
-                                router.push('/docs')
-                            }}>
-                                <Paintbrush2Icon className='w-6 h-6 cursor-pointer' />
-                            </Button>
+                                <Button variant={"ghost"} onClick={() => {
+
+                                }}>
+                                    <Bell className='w-6 h-6 cursor-pointer' />
+                                </Button>
+                                <Button variant={"ghost"} onClick={() => {
+                                    router.push('/docs')
+                                }}>
+                                    <Paintbrush2Icon className='w-6 h-6 cursor-pointer' />
+                                </Button>
                             </div>
                         </div>
                         <div className='px-2'>
                             {ConversationState.loading && <div>{ConversationState.error}</div>}
-                            {ArrangeDateByeDate?.map((item) => {
-                                return <UserCard
-                                    onclick={() => { navigateToPage(item._id) }}
-                                    key={item._id}
-                                    conversationData={item}
-                                    profile={ProfileState.user as any}
-                                    userData={item.userDetails} />
+                            {margeList?.map((item) => {
+                                if (item.type === "private") {
+                                    return <UserCard key={item.item._id} data={item.item} />
+                                }
                             })}
                         </div>
 
