@@ -71,7 +71,7 @@ const initialRoomDataState: RoomDataState = {
     members: [],
     roomId: null,
     AuthorId: null,
-    canvasData: []
+    canvasData: [],
 }
 
 const roomReducer = (state: RoomDataState, action: any) => {
@@ -85,9 +85,10 @@ const roomReducer = (state: RoomDataState, action: any) => {
         case "SET_ROOM_DATA":
             return {
                 ...state,
+                canvasData: action.payload.canvasData,
                 members: action.payload.members,
                 roomId: action.payload.roomId,
-                AuthorId: action.payload.AuthorId
+                AuthorId: action.payload.AuthorId,
             }
         default:
             return state
