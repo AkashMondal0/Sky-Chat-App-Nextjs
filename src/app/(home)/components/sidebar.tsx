@@ -79,13 +79,13 @@ export default function Sidebar({ ConversationState,
 
     return (
         <div>
-            <Card className="col-span-3 border-none">
-                <ScrollArea className={`h-[100dvh] w-full md:w-96 scroll-smooth`}>
-                    <div className="flex justify-between w-full p-6 items-center">
-                        <CardTitle>Sky Chat</CardTitle>
-                        <UserNav user={ProfileState.user} />
-                    </div>
-                    <CardContent className='p-0'>
+            <div className="col-span-3 border-none">
+                <ScrollArea className={`min-h-[100dvh] w-full md:w-96 scroll-smooth border-r`}>
+                    <div>
+                        <div className="flex justify-between w-full p-6 items-center">
+                            <CardTitle>Sky Chat</CardTitle>
+                            <UserNav user={ProfileState.user} />
+                        </div>
                         <div className='flex justify-between items-center w-full mb-2 px-4'>
                             <div className='flex gap-1'>
                                 <SearchModal />
@@ -104,6 +104,8 @@ export default function Sidebar({ ConversationState,
                                 </Button>
                             </div>
                         </div>
+                    </div>
+                    <CardContent className='p-0'>
                         <div className='px-2'>
                             {ConversationState.loading && <div>{ConversationState.error}</div>}
                             {margeList?.map((item) => {
@@ -115,7 +117,7 @@ export default function Sidebar({ ConversationState,
 
                     </CardContent>
                 </ScrollArea>
-            </Card>
+            </div>
         </div>
     )
 }

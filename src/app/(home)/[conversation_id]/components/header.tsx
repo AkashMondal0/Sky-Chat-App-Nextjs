@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SendGameRequest } from '@/redux/slices/games';
 import uid from '@/lib/uuid';
 import { RootState } from '@/redux/store';
+import { LoadingComponent } from '../page';
 
 interface HeaderProps {
     data: PrivateChat | undefined
@@ -43,6 +44,10 @@ const Header: FC<HeaderProps> = ({
             await dispatch(SendGameRequest(createNewRoom as any) as any)
             // router.push(`/games/${createNewRoom?._id}?userId=${userData._id}`)
         }
+    }
+
+    if (!data) {
+        return <LoadingComponent />
     }
 
     return (

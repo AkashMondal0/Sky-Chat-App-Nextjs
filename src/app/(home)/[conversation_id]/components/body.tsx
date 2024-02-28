@@ -6,6 +6,9 @@ import MessagesCard from './message';
 import { PrivateChat, PrivateMessageSeen, User } from '@/interface/type';
 import { sendMessageSeenPrivate } from '@/redux/slices/conversation';
 import { useDispatch } from 'react-redux';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
+import { LoadingComponent } from '../page';
 
 
 interface ChatBodyProps {
@@ -17,9 +20,6 @@ const ChatBody: FC<ChatBodyProps> = ({
     data,
     profile
 }) => {
-    if (!profile) {
-        return <div>user not found</div>
-    }
     const ref = useRef<HTMLDivElement>(null)
     const dispatch = useDispatch()
 
@@ -58,6 +58,14 @@ const ChatBody: FC<ChatBodyProps> = ({
         }
     }, [data?.messages])
 
+    if (!data) {
+        return <LoadingComponent />
+    }
+
+    if (!profile) {
+        return <LoadingComponent />
+    }
+
     return (
         <Suspense>
             <div className='flex-1 overflow-y-auto px-2' id='style-1'>
@@ -78,7 +86,5 @@ const ChatBody: FC<ChatBodyProps> = ({
 };
 
 export default ChatBody;
-
-
 
 

@@ -14,6 +14,7 @@ import { createPrivateChatConversation, sendMessagePrivate } from '@/redux/slice
 import { createConnectionApi } from '@/redux/slices/profile';
 import { useRouter } from 'next/navigation';
 import { ProfileContext } from '@/components/provider/Profile_provider';
+import { LoadingComponent } from '../page';
 interface ChatFooterProps {
     conversation: PrivateChat | undefined
     profile?: User | undefined
@@ -98,15 +99,19 @@ const ChatFooter: FC<ChatFooterProps> = ({
         }
     }, [])
 
+    if (!profile) return <LoadingComponent/>
+
+    if (!conversation) return <LoadingComponent/>
+
 
     return (
-        <div className={cn("w-full border-t items-center p-2 h-20 my-auto max-h-20 flex gap-2")}>
+        <div className={cn("w-full border-t items-center p-2 h-16 my-auto max-h-20 flex gap-2")}>
             <form onSubmit={handleSubmit(sendMessageHandle)} className="flex w-full items-center dark:bg-neutral-900
-                bg-neutral-200 dark:text-neutral-100 text-neutral-800 rounded-xl">
+                bg-neutral-200 dark:text-neutral-100 text-neutral-800 rounded-3xl">
                 <input
                     id='message-input'
                     className='outline-none focus:none bg-transparent w-full p-2
-                    dark:placeholder-neutral-100 placeholder-neutral-800'
+                    dark:placeholder-neutral-100 placeholder-neutral-800' 
                     type="text" placeholder="send a message"
 
                     {...register("message", {
@@ -128,7 +133,7 @@ const ChatFooter: FC<ChatFooterProps> = ({
             </form>
                 <Button type="submit"
                     onClick={handleSubmit(sendMessageHandle)}
-                    variant={"outline"} className='rounded-xl'>
+                    variant={"outline"} className='rounded-3xl'>
                     <Send />
                 </Button>
         </div>

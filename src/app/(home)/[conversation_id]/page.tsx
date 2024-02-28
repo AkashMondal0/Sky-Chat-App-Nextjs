@@ -8,6 +8,8 @@ import { redirect, useSearchParams } from 'next/navigation'
 import { PrivateChat } from '@/interface/type'
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
+import Link from 'next/link'
+
 
 interface ConversationPageProps {
     params: {
@@ -50,12 +52,17 @@ const ConversationPage = ({
         }
     }, [Conversation_Slice.List, conversation_id, searchQuery, searchUser])
 
-    if (!conversation) {
-        return redirect("/")
+    if (!conversation && !Profile_Slice && Conversation_Slice.loading) {
+      return  <>
+            <div className="w-full h-[100dvh] flex items-center justify-center gap-2">
+                No Conversation Found <Link href={"/"} className="underline text-blue-500">Go Home</Link>
+            </div>
+        </>
     }
 
+
     return (
-        <div className={`flex flex-col h-[100dvh] w-full rounded-md border overflow-hidden`}>
+        <div className={`flex flex-col h-[100dvh] w-full overflow-hidden`}>
             <Header
                 profile={Profile_Slice.user || undefined}
                 data={conversation} />
@@ -72,9 +79,9 @@ const ConversationPage = ({
 
 export default ConversationPage
 
-const LoadingComponent = () => {
+export const LoadingComponent = () => {
     return <div className='w-full h-[100dvh] flex flex-col'>
-        <div className='flex my-4 mx-2 h-16'>
+        <div className='flex my-4 px-2 h-16 border-b pb-2'>
             <Skeleton className="h-12 w-12 rounded-full" />
             <div className='flex flex-col'>
                 <Skeleton className="h-5 w-72 m-1" />
@@ -88,6 +95,6 @@ const LoadingComponent = () => {
             </div>)}
         </ScrollArea>
 
-        <div className='px-5 h-16 sticky bottom-0 z-1 my-2'><Skeleton className="h-10 w-full rounded-3xl" /></div>
+        <div className='px-2 h-16 sticky bottom-0 z-1 my-2 border-t pt-2'><Skeleton className="h-10 w-full rounded-3xl" /></div>
     </div>
 }
