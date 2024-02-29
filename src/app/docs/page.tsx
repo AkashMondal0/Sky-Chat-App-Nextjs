@@ -36,7 +36,7 @@ function DocsHome() {
       }],
       roomId: roomId,
       AuthorId: socket.id,
-      canvasData: []
+      canvasData: [],
     })
     router.push(`/docs/${roomId}?admin=${socket.id}`)
   }, [router])

@@ -17,6 +17,7 @@ import { fetchSearchUser } from '@/redux/slices/users';
 import { Input } from '../ui/input';
 import { useRouter } from 'next/navigation';
 import uid from '@/lib/uuid';
+import { DialogClose } from '../ui/dialog';
 
 
 interface SearchModalProps { }
@@ -94,18 +95,20 @@ const UserItem = ({ data, onClick }: {
 }) => {
 
   return (
-    <Button
-      onClick={onClick}
-      variant={"ghost"} className="h-12 px-2 my-2 flex justify-between w-full">
-      <div className="h-12 my-2 flex justify-between">
-        <div className="flex items-center">
-          {data.profilePicture && (<Avatar className="h-10 w-10 mr-2">
-            <AvatarImage src={data.profilePicture} alt="Avatar" />
-            <AvatarFallback>{data.username[0]}</AvatarFallback>
-          </Avatar>)}
-          <span>{data.email}</span>
+    <DialogClose asChild>
+      <Button
+        onClick={onClick}
+        variant={"ghost"} className="h-12 px-2 my-2 flex justify-between w-full">
+        <div className="h-12 my-2 flex justify-between">
+          <div className="flex items-center">
+            {data.profilePicture && (<Avatar className="h-10 w-10 mr-2">
+              <AvatarImage src={data.profilePicture} alt="Avatar" />
+              <AvatarFallback>{data.username[0]}</AvatarFallback>
+            </Avatar>)}
+            <span>{data.email}</span>
+          </div>
         </div>
-      </div>
-    </Button>
+      </Button>
+    </DialogClose>
   )
 }

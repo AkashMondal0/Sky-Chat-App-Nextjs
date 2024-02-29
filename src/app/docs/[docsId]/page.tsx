@@ -2,7 +2,7 @@
 'use client'
 
 import { ReactSketchCanvas } from 'react-sketch-canvas';
-import React, { useContext, useEffect, } from "react"
+import React, { useContext, useEffect, useState, } from "react"
 import Header from './components/header';
 import { Button } from '@/components/ui/button';
 import { PencilRuler } from 'lucide-react';
@@ -30,6 +30,7 @@ export interface Members_Sketch {
 }
 
 export default function PlaygroundPage() {
+
   const {
     canvas,
     tool,
@@ -40,13 +41,19 @@ export default function PlaygroundPage() {
     sendMyCanvas,
     roomData,
     loadCanvas,
+    sendCurrentCursorLocation
   } = useContext(SketchContext);
+  
+  const handleMouseMove = (event:any) => {
+    sendCurrentCursorLocation({ x: event.clientX, y: event.clientY });
+  };
 
   useEffect(() => {
     loadCanvas?.()
   }, [])
+
   return (
-    <div>
+    <div onMouseMove={handleMouseMove}>
       <Header
         profileState={profileState}
         toggleScreen={toggleScreen}
@@ -87,9 +94,3 @@ export default function PlaygroundPage() {
     </div>
   )
 }
-
-
-
-
-
-
