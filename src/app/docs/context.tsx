@@ -8,7 +8,7 @@ import { createContext } from "react"
 import { useSelector } from "react-redux"
 import { ReactSketchCanvasRef } from "react-sketch-canvas"
 import { Members_Sketch } from "./[docsId]/page"
-import { RoomDataState, initialRoomDataState, initialToolState, reducer, roomReducer, toolProps } from "./reducer"
+import { RoomDataState, getRandomColorPicker, initialRoomDataState, initialToolState, reducer, roomReducer, toolProps } from "./reducer"
 import { toast } from "sonner"
 import { User, UserType } from "@/interface/type"
 import { redirect, useRouter } from "next/navigation"
@@ -142,7 +142,30 @@ export function SketchProvider({ children }: SketchProviderProps) {
         })
     }, [roomData.roomId, profileState])
 
-    // const throttledCursorFunction = _.throttle((data) => sendCurrentCursorLocation(data), 100);
+    const setCursorData = useCallback((data: {
+        location: { x: number, y: number },
+        userData: User
+    }) => {
+        setCursorLocation((prev) => {
+            const updatedCursor = prev.findIndex((item) => item.user._id === data.userData._id)
+            if (updatedCursor === -1) {
+                return [...prev, {
+                    x: data.location.x,
+                    y: data.location.y,
+                    user: data.userData,
+                    color: getRandomColorPicker()
+                }]
+            } else {
+                prev[updatedCursor] = {
+                    x: data.location.x,
+                    y: data.location.y,
+                    user: data.userData,
+                    color: prev[updatedCursor].color,
+                }
+                return [...prev]
+            }
+        })
+    }, [])
 
     useEffect(() => {
         function handleResize() {
@@ -187,25 +210,7 @@ export function SketchProvider({ children }: SketchProviderProps) {
 
         // cursor location
         socket.on('following_pointer_receiver', (data) => {
-            setCursorLocation((prev) => {
-                const updatedCursor = prev.findIndex((item) => item.user._id === data.userData._id)
-                if (updatedCursor === -1) {
-                    return [...prev, { 
-                        x: data.location.x, 
-                        y: data.location.y, 
-                        user: data.userData,
-                        color: getRandomColor()
-                    }]
-                } else {
-                    prev[updatedCursor] = { 
-                        x: data.location.x, 
-                        y: data.location.y, 
-                        user: data.userData ,
-                        color: prev[updatedCursor].color,
-                    }
-                    return [...prev]
-                }
-            })
+            setCursorData(data)
         })
 
 
@@ -217,14 +222,7 @@ export function SketchProvider({ children }: SketchProviderProps) {
             socket.off('sketch_user_join_Broadcast_room_receiver');
         }
     }, [])
-    function getRandomColor() {
-        var letters = '0123456789ABCDEF';
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-          color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-      }
+   
     return <SketchContext.Provider
         value={{
             canvas,
@@ -245,6 +243,18 @@ export function SketchProvider({ children }: SketchProviderProps) {
             decline={declineRequest}
             data={tool.alert.data.user}
         />
+        {/* <FollowPointer
+            // key={index}
+            x={80}
+            y={80}
+            color={getRandomColorPicker()}
+            data={
+                <TitleComponent
+                    title={"Akash"}
+                    color={getRandomColorPicker()}
+                    avatar={""} />
+            }
+        /> */}
         {cursorLocation.map((item, index) => (
             <FollowPointer
                 key={index}
@@ -252,10 +262,10 @@ export function SketchProvider({ children }: SketchProviderProps) {
                 y={item.y}
                 color={item.color}
                 data={
-                    <TitleComponent 
-                    title={item.user.username} 
-                    color={item.color}
-                    avatar={item.user.profilePicture || ""} />
+                    <TitleComponent
+                        title={item.user.username}
+                        color={item.color}
+                        avatar={item.user.profilePicture || ""} />
                 }
             />
         ))}
@@ -277,18 +287,45 @@ const TitleComponent = ({
         style={{
             backgroundColor: color,
         }}
-    className="flex space-x-2 items-center p-[1px] rounded-full">
-        <div className="flex space-x-2 items-center">
-            {
-                avatar ? <img
-                    src={avatar}
-                    alt="avatar"
-                    className="rounded-full object-cover w-9 h-9 border-white border-1"
-                /> : <div className="h-9 w-9 rounded-full bg-gray-300 flex justify-center items-center">
-                    <p className="text-black text-4xl">{title[0]}</p>
-                </div>
-            }
-            <p className="pr-1 text-sm">{title}</p>
+        className="flex items-center p-[2px] rounded-full">
+        <div className="flex items-center">
+            {<AvatarDemo
+                src={avatar}
+                alt="avatar"
+                fallback={title[0]}
+            />}
+            <p className="px-1">{title}</p>
         </div>
     </div>
 );
+
+import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/ui/avatar"
+
+export function AvatarDemo({
+    src,
+    alt,
+    fallback,
+}: {
+    src: string;
+    alt: string;
+    fallback: string;
+}) {
+    return (
+        <Avatar style={{
+            width: 25,
+            height: 25,
+        }}>
+            <AvatarImage
+                src={src}
+                alt={alt}
+            />
+            <AvatarFallback>
+                {fallback}
+            </AvatarFallback>
+        </Avatar>
+    )
+}

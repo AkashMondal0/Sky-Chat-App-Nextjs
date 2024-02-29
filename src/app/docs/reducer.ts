@@ -101,5 +101,37 @@ export {
     reducer,
     initialToolState,
     roomReducer,
-    initialRoomDataState
+    initialRoomDataState,
+    getRandomColorPicker
 }
+
+ function getRandomColorPicker() {
+        const colors = [
+             "#FF0000",
+             "#FFA500",
+             "#FFFF00",
+             "#008000",
+             "#0000FF",
+             "#4B0082",
+             "#EE82EE",
+             "#A9A9A9",
+             "#FFA07A",
+             "#20B2AA",
+             "#FF4500",
+             "#FFD700",
+             "#00FF00",
+             "#00FFFF",
+             "#0000FF",
+             "#800080",
+             "#FF00FF",
+             "#808080",
+             "#FF6347",
+             "#4682B4",
+             "#800000",
+             "#FFD700",
+             "#008080",
+             "#FF00FF",
+             "#808080",
+        ];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
