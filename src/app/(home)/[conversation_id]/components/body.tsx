@@ -8,7 +8,7 @@ import { sendMessageSeenPrivate } from '@/redux/slices/conversation';
 import { useDispatch } from 'react-redux';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LoadingComponent } from '../page';
+import LoadingComponent from './LoadingComponent';
 
 
 interface ChatBodyProps {

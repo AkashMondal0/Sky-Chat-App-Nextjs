@@ -31,15 +31,6 @@ This is a real time chat application developed using Nextjs and Nodejs. It has f
 <!-- ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here) -->
 ## Realtime Sketch Video
 [![Watch the video](/public/github.mp4)](/public/github.mp4)
-
-
-## Quick start with  Docker image
-
-Chat app docker image 
-
-```bash
-docker run -d -p 3000:3000 akashmondal0/sky-chat-nextjs:latest
-```
     
 ## Run Locally
 
@@ -61,6 +52,45 @@ Install dependencies
   npm install
 ```
 
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`1. change ip address to your local ip address (192.168.31.212)`
+
+`NEXT_PUBLIC_BACKEND_URL`
+
+`NEXT_PUBLIC_STORAGE_URL`
+
+`MONGODB_URI`
+
+`REDIS_URL`
+
+`JWT_SECRET`
+
+`KAFKA_BROKER`
+
+# for kafka ssl
+
+`CA_PATH`: "./src/kafka/ca.pem"
+
+`SASL_MECHANISM`: "plain"
+
+`SASL_USERNAME`
+
+`SASL_PASSWORD`
+
+## Set up backend
+
+Docker  is required to set up a local instance of MongoDB and Redis. You can download it from [here](https://www.docker.com/).
+
+1. Install all required docker images  by running `docker-compose up -d` in the root folder of this repository.
+
+
+```bash
+docker-compose up -d
+```
+
 Start the app development mode
 
 ```bash
@@ -77,27 +107,6 @@ Start the app
 
 ```bash
   npm run start
-```
-
-## Environment Variables
-
-To run this project, you will need to add the following environment variables to your .env file
-
-`1. change ip address to your local ip address (192.168.31.212)`
-
-`NEXT_PUBLIC_HOST_URL`
-
-`NEXT_PUBLIC_STORAGE_URL`
-
-
-## Set up backend
-
-Docker  is required to set up a local instance of MongoDB and Redis. You can download it from [here](https://www.docker.com/).
-
-1. Install all required docker images  by running `docker-compose up -d` in the root folder of this repository.
-
-```bash
-docker-compose up -d
 ```
 
 ## Next js App running  on 

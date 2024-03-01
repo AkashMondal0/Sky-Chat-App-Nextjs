@@ -14,7 +14,7 @@ import { createPrivateChatConversation, sendMessagePrivate } from '@/redux/slice
 import { createConnectionApi } from '@/redux/slices/profile';
 import { useRouter } from 'next/navigation';
 import { ProfileContext } from '@/components/provider/Profile_provider';
-import { LoadingComponent } from '../page';
+import LoadingComponent from './LoadingComponent';
 interface ChatFooterProps {
     conversation: PrivateChat | undefined
     profile?: User | undefined

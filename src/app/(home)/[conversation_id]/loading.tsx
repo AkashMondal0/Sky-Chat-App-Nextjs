@@ -1,5 +1,6 @@
 import React from 'react'
-import { LoadingComponent } from './page'
+import LoadingComponent from './components/LoadingComponent'
+
 
 const loading = () => {
   return <LoadingComponent/>

@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SendGameRequest } from '@/redux/slices/games';
 import uid from '@/lib/uuid';
 import { RootState } from '@/redux/store';
-import { LoadingComponent } from '../page';
+import LoadingComponent from './LoadingComponent';
 
 interface HeaderProps {
     data: PrivateChat | undefined

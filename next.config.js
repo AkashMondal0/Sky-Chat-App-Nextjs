@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
-  // reactStrictMode: true,
-  images: {
-    domains: ["http://13.127.232.152:4001/"]
+  reactStrictMode: true,
+  env: {
+    NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL
   },
   webpack: (config) => {
     config.externals.push({
