@@ -135,7 +135,7 @@ export const sendMessagePrivate = createAsyncThunk(
           senderId: member._id,
           receiverId: receiver._id,
           deleted: false,
-          // fileUrl: files.length >= 1 ? files : null,
+          fileUrl: files.length >= 1 ? files : null,
           seenBy: [
             member._id,
           ],
@@ -146,14 +146,15 @@ export const sendMessagePrivate = createAsyncThunk(
         return newMessage
       }
 
+      console.log(assets)
       if (assets.length >= 1) {
-
+        
         for (let i = 0; i < assets.length; i++) {
-          if (assets[i].type === 'image') {
-            assets[i].url = await skyUploadImage([assets[i].url], member._id).then(res => res.data[0])
-          } else {
-            assets[i].url = await skyUploadVideo([assets[i].url], member._id).then(res => res.data[0])
-          }
+          // if (assets[i].type === 'image') {
+          //   assets[i].url = await skyUploadImage([assets[i].url], member._id).then(res => res.data[0])
+          // } else {
+          //   assets[i].url = await skyUploadVideo([assets[i].url], member._id).then(res => res.data[0])
+          // }
         }
 
         assets.map(item => {

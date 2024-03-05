@@ -25,24 +25,24 @@ services:
       NEXT_PUBLIC_HOST_URL: "http://localhost:4000"
       NEXT_PUBLIC_STORAGE_URL: "http://localhost:4001"
 
-  storage:
-    image: akashmondal0/sky-storage:latest
-    restart: always
-    ports:
-      - 4001:4001
-    container_name: storage
-    volumes:
-      - ./storage:/app/storage
-    environment:
-      PORT: 4001
-      HOST: "http://localhost:4001"
+  # storage:
+  #   image: akashmondal0/sky-storage:latest
+  #   restart: always
+  #   ports:
+  #     - 4001:4001
+  #   container_name: storage
+  #   volumes:
+  #     - ./storage:/app/storage
+  #   environment:
+  #     PORT: 4001
+  #     HOST: "http://localhost:4001"
   
-  nginx:
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+  # nginx:
+  #   image: nginx:latest
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/conf.d/default.conf
 
   # mongo:
   #   image: mongo:latest

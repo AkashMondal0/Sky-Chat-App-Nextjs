@@ -117,10 +117,10 @@ export interface Status {
 }
 
 export interface Assets {
-    _id: string,
-    url: string,
-    type: 'image' | 'video' | 'audio' | "text"
-    caption: string;
+    _id?: string,
+    url?: string,
+    type?: 'image' | 'video' | 'audio' | "text"
+    caption?: string;
 }
 
 
