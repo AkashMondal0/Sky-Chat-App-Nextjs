@@ -1,9 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { FC, useCallback, useContext, useState } from 'react';
+/* eslint-disable @next/next/no-img-element */
+import { FC, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Send } from 'lucide-react';
-import { PrivateChat, User, typingState } from '@/interface/type';
+import { Paperclip, Send } from 'lucide-react';
+import { Assets, PrivateChat, User, typingState } from '@/interface/type';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -15,6 +15,19 @@ import { createConnectionApi } from '@/redux/slices/profile';
 import { useRouter } from 'next/navigation';
 import { ProfileContext } from '@/components/provider/Profile_provider';
 import LoadingComponent from './LoadingComponent';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import uid from '@/lib/uuid';
+import { toast } from 'sonner';
+import { skyUploadImage } from '@/lib/upload-file';
+import { localhost, localhostStorage } from '../../../../../keys';
+import axios from 'axios';
 interface ChatFooterProps {
     conversation: PrivateChat | undefined
     profile?: User | undefined
@@ -38,6 +51,7 @@ const ChatFooter: FC<ChatFooterProps> = ({
             message: "",
         }
     });
+    const [assets, setAssets] = useState<Assets[]>([])
 
     const onFocus = useCallback(() => {
         if (conversation && profile && !newConversation) {
@@ -49,7 +63,7 @@ const ChatFooter: FC<ChatFooterProps> = ({
             } as typingState
             socket.emit('message_typing_sender', message)
         }
-    }, [])
+    }, [conversation, newConversation, profile])
 
     const onBlurType = useCallback(() => {
         if (conversation && profile && !newConversation) {
@@ -62,7 +76,7 @@ const ChatFooter: FC<ChatFooterProps> = ({
             socket.emit('message_typing_sender', message)
         }
         setStopTyping(true)
-    }, [])
+    }, [conversation, newConversation, profile])
 
     const debouncedHandleOnblur = useCallback(debounce(onBlurType, 2000), []);
 
@@ -86,58 +100,168 @@ const ChatFooter: FC<ChatFooterProps> = ({
             }
             reset()
         } else {
-            if (!conversation || !profile) return
+            if (!conversation || !profile) return toast.error("Error sending message")
             const _data = {
                 conversationId: conversation?._id as string,
                 content: data.message,
                 member: profile,
                 receiver: conversation?.userDetails as User,
-                assets: []
+                assets: assets
             }
-            reset()
             dispatch(sendMessagePrivate(_data) as any)
+            setAssets([])
+            reset()
+        }
+    }, [assets, conversation, dispatch, newConversation, profile, reset, router])
+
+
+    const handleFileUpload = useCallback(() => {
+        document?.getElementById('files')?.click()
+    }, [])
+
+    const onChangeFile = useCallback((e: any) => {
+        const files = e.target.files
+        if (files.length > 0) {
+            const _assets = Array.from(files).map((file: any) => {
+                return {
+                    _id: uid(),
+                    url: file,
+                    type: file.type.split('/')[0],
+                }
+            })
+            setAssets(_assets)
         }
     }, [])
 
-    if (!profile) return <LoadingComponent/>
 
-    if (!conversation) return <LoadingComponent/>
+    if (!profile) return <LoadingComponent />
 
+    if (!conversation) return <LoadingComponent />
+
+    const dropdownData = [{
+        label: "Photo",
+        onClick: handleFileUpload
+    },
+    {
+        label: "Document",
+        onClick: () => { }
+    }]
 
     return (
-        <div className={cn("w-full border-t items-center p-2 h-16 my-auto max-h-20 flex gap-2")}>
-            <form onSubmit={handleSubmit(sendMessageHandle)} className="flex w-full items-center dark:bg-neutral-900
-                bg-neutral-200 dark:text-neutral-100 text-neutral-800 rounded-3xl">
+        <>
+            <UploadFileComponent assets={assets} />
+            <div className={cn("w-full border-t items-center p-2 h-16 my-auto max-h-20 flex gap-2")}>
+                <DropDownMenu data={dropdownData}>
+                    <Button type="submit"
+                        variant={"outline"} className='rounded-3xl'>
+                        <Paperclip />
+                    </Button>
+                </DropDownMenu>
                 <input
-                    id='message-input'
-                    className='outline-none focus:none bg-transparent w-full p-2
-                    dark:placeholder-neutral-100 placeholder-neutral-800' 
-                    type="text" placeholder="send a message"
-
-                    {...register("message", {
-                        required: true,
-                        onChange(e) {
-                            if (stopTyping) {
-                                onFocus()
-                                setStopTyping(false)
-                            }
-                            else {
-                                debouncedHandleOnblur()
-                            }
-                            if (e.target.value === "") {
-                                debouncedHandleOnblur()
-                            } 
-                        },
-                    })}
+                    type="file"
+                    accept="image/*, video/*, audio/*"
+                    multiple
+                    name="file"
+                    id="files"
+                    className='hidden'
+                    onChange={(e) => { onChangeFile(e) }}
                 />
-            </form>
+                <form onSubmit={handleSubmit(sendMessageHandle)} className="flex w-full items-center dark:bg-neutral-900
+                bg-neutral-200 dark:text-neutral-100 text-neutral-800 rounded-3xl">
+                    <input
+                        id='message-input'
+                        className='outline-none focus:none bg-transparent w-full p-2
+                    dark:placeholder-neutral-100 placeholder-neutral-800'
+                        type="text" placeholder="send a message"
+
+                        {...register("message", {
+                            required: true,
+                            onChange(e) {
+                                if (stopTyping) {
+                                    onFocus()
+                                    setStopTyping(false)
+                                }
+                                else {
+                                    debouncedHandleOnblur()
+                                }
+                                if (e.target.value === "") {
+                                    debouncedHandleOnblur()
+                                }
+                            },
+                        })}
+                    />
+                </form>
                 <Button type="submit"
-                    onClick={handleSubmit(sendMessageHandle)}
+                    onClick={() => {
+                        if (assets.length > 0) {
+                            sendMessageHandle({ message: "" })
+                        }
+                        else {
+                            handleSubmit(sendMessageHandle)()
+                        }
+                    }}
                     variant={"outline"} className='rounded-3xl'>
                     <Send />
                 </Button>
-        </div>
+            </div>
+        </>
     );
 };
 
 export default ChatFooter;
+
+const UploadFileComponent = ({
+    assets
+}: {
+    assets: Assets[]
+}) => {
+
+    if (assets.length <= 0) return <></>
+    return <div className='flex items-center'>
+        {
+            assets.map((asset, index) => {
+                if (asset.type === "image") {
+                    return <div className='w-[100px] h-[100px]' key={index}>
+                        <img key={index} src={URL?.createObjectURL(asset.url as any)} alt="" />
+                    </div>
+                }
+                if (asset.type === "video") {
+                    return <video src={URL?.createObjectURL(asset.url as any)} width="100" height="100" controls key={index}></video>
+                }
+                if (asset.type === "audio") {
+                    return <audio key={index} src={URL?.createObjectURL(asset.url as any)} controls />
+                }
+                return <div key={index} className='bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 p-2 rounded-3xl'>
+                    {asset.caption}
+                </div>
+            })
+        }
+    </div>
+}
+
+const DropDownMenu = ({
+    children,
+    data
+}: {
+    children: React.ReactNode,
+    data: {
+        label: string
+        onClick: () => void
+    }[]
+}) => {
+    return <DropdownMenu>
+        <DropdownMenuTrigger>
+            {children}
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className='mx-1'>
+            <DropdownMenuLabel>Options</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {
+                data.map((item, index) => {
+                    return <DropdownMenuItem key={index} onClick={item.onClick}>{item.label}</DropdownMenuItem>
+                })
+            }
+        </DropdownMenuContent>
+    </DropdownMenu>
+}
+

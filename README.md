@@ -113,14 +113,10 @@ Start the app
 `http://localhost:3000`
 ## Server API running on 
 `http://localhost:4000`
-## Storage Server  running on 
-`http://localhost:4001`
 
 ## Backend github repository
 
 backend repository link : [https://github.com/AkashMondal0/sky-chat-backend.git](https://github.com/AkashMondal0/sky-chat-backend.git)
-
-Storage repository link : [https://github.com/AkashMondal0/skyinc-storage.git](https://github.com/AkashMondal0/skyinc-storage.git)
 
 ## Feedback
 

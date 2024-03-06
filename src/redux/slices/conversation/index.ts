@@ -60,7 +60,7 @@ export const createPrivateChatConversation = createAsyncThunk(
         chatData: conversation
       });
       socket.emit('message_sender', newMessage2)
-      const conversationData:PrivateChat = {
+      const conversationData: PrivateChat = {
         ...conversation,
         messages: [newMessage2],
         lastMessageContent: newMessage2.content,
@@ -125,17 +125,17 @@ export const sendMessagePrivate = createAsyncThunk(
   }, thunkApi) => {
     try {
 
-      const sendMessageApi = async (files: File[]) => {
+      const sendMessageApi = async (files: Assets[]) => {
         const newMessage: PrivateMessage = {
           _id: new Date().getTime().toString(),
-          content: content,
+          content: content || files.length >= 1 ? "file" : content,
           memberId: member._id,
           memberDetails: member,
           conversationId: conversationId,
           senderId: member._id,
           receiverId: receiver._id,
           deleted: false,
-          // fileUrl: files.length >= 1 ? files : null,
+          fileUrl: files.length >= 1 ? files : null,
           seenBy: [
             member._id,
           ],
@@ -147,25 +147,27 @@ export const sendMessagePrivate = createAsyncThunk(
       }
 
       if (assets.length >= 1) {
-
-        for (let i = 0; i < assets.length; i++) {
-          if (assets[i].type === 'image') {
-            assets[i].url = await skyUploadImage([assets[i].url], member._id).then(res => res.data[0])
-          } else {
-            assets[i].url = await skyUploadVideo([assets[i].url], member._id).then(res => res.data[0])
+        const files = await Promise.all(assets.map(async (item) => {
+          if (item.type === 'image') {
+            const res = await skyUploadImage([item.url], member._id)
+            return {
+              url: res.data[0],
+              type: item.type,
+              caption: item.caption
+            }
           }
-        }
 
-        assets.map(item => {
-          return {
-            url: item.url,
-            type: item.type,
-            caption: item.caption
+          else if (item.type === 'video') {
+            const res = await skyUploadVideo([item.url], member._id)
+            return {
+              url: res.data[0],
+              type: item.type,
+              caption: item.caption
+            }
           }
-        })
+        }))
 
-        // return sendMessageApi(assets as File[]) as any
-        return sendMessageApi([]) as any
+        return sendMessageApi(files)
       } else {
         return sendMessageApi([])
       }
