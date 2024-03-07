@@ -14,12 +14,12 @@ spec:
     spec:
       containers:
         - name: next-chat
-          image: akashmondal0/next-chat:latest
+          image: akashmondal0/sky-chat-nextjs:latest
           env:
-          - name: DATABASE_URL
-            value: mysql://root:akash@2003@localhost:3306/chatapp
-          - name: NEXT_PUBLIC_SOCKET_URL 
-            value: http://locahost:3003
+          - name: NEXT_PUBLIC_BACKEND_URL
+            value: http://127.0.0.1:4000
+          # - name: NEXT_PUBLIC_SOCKET_URL 
+          #   value: http://locahost:3003
           ports:
             - containerPort: 3000
           imagePullPolicy: Always
