@@ -10,12 +10,12 @@ pipeline {
         }
         stage('building the nextjs-app image') {
             steps {
-                sh "sudo docker build -t akashmondal0/sky-chat-nextjs:latest ."
+                sh "docker build -t akashmondal0/sky-chat-nextjs:latest ."
             }
         }
         stage('push docker hub') {
             steps {
-                sh "sudo docker compose up -d"
+                sh "docker compose up -d"
             }
         }
         // stage('login docker hub') {
