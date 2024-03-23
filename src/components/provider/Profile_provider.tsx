@@ -15,6 +15,7 @@ import { GameRequestToast } from "../shared/MyAlert"
 import { gameRequestSet } from "@/redux/slices/games"
 import { RootState } from "@/redux/store"
 import { InGameData } from "@/app/games/[roomId]/page"
+import { signOut } from "next-auth/react"
 
 interface ProfileProviderProps {
     children: React.ReactNode
@@ -49,9 +50,7 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
         dispatch(Logout())
         dispatch(resetProfileState())
         dispatch(resetPrivateChatList())
-        deleteCookie('token')
-        router.replace('/auth/login')
-        router.refresh()
+        signOut()
     }, [])
 
     const handleQRLogin = useCallback(async (token: string) => {

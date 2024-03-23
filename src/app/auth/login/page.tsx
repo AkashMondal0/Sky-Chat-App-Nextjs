@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { Github, QrCode } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { useCallback, useContext, useEffect, useState } from "react"
@@ -23,7 +23,7 @@ import z from "zod"
 import { ProfileContext } from "@/components/provider/Profile_provider"
 import QRCode from "react-qr-code";
 import { socket } from "@/lib/socket"
-
+import { signIn, useSession } from "next-auth/react"
 const schema = z.object({
     email: z.string().email({ message: "Invalid email" })
         .nonempty({ message: "Email is required" }),
@@ -33,6 +33,13 @@ const schema = z.object({
 
 export default function AuthenticationPage() {
     const router = useRouter()
+    const session = useSession({
+        required: false,
+    })
+
+    if (session.data) {
+        redirect("/")
+    }
     const dispatch = useDispatch()
     const profileContext = useContext(ProfileContext)
     const [loginToggle, setLoginToggle] = useState(false)
@@ -50,13 +57,24 @@ export default function AuthenticationPage() {
         email: string,
         password: string,
     }) => {
-        const _data = await dispatch(loginApiHandle({
-            email: data.email,
-            password: data.password,
-        }) as any)
-        if (_data.payload?.token) {
-            profileContext?.StartApp()
-            router.replace('/')
+        try {
+            const _data = await dispatch(loginApiHandle({
+                email: data.email,
+                password: data.password,
+            }) as any)
+            if (_data.payload?.token) {
+
+                profileContext?.StartApp()
+                signIn("credentials", {
+                    email: _data.payload.email,
+                    name: _data.payload.name,
+                    id: _data.payload.id,
+                    image: _data.payload.image,
+                    redirect: false,
+                });
+            }
+        } catch (error) {
+            console.log(error)
         }
     }, [])
 

@@ -128,7 +128,7 @@ export const sendMessagePrivate = createAsyncThunk(
       const sendMessageApi = async (files: Assets[]) => {
         const newMessage: PrivateMessage = {
           _id: new Date().getTime().toString(),
-          content: content || files.length >= 1 ? "file" : content,
+          content: content || 'File',
           memberId: member._id,
           memberDetails: member,
           conversationId: conversationId,

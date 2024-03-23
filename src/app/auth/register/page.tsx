@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { Github } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { useCallback, useContext } from "react"
@@ -21,6 +21,7 @@ import { registerApiHandle } from "@/redux/slices/authentication"
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from "zod"
 import { ProfileContext } from "@/components/provider/Profile_provider"
+import { signIn, useSession } from "next-auth/react"
 
 const schema = z.object({
     email: z.string().email({ message: "Invalid email" })
@@ -33,6 +34,13 @@ const schema = z.object({
 
 export default function AuthenticationPage() {
     const router = useRouter()
+    const session = useSession({
+        required: false,
+    })
+
+    if (session.data) {
+        redirect("/")
+    }
     const profileContext = useContext(ProfileContext)
     const Authentication_Slice = useSelector((state: RootState) => state.Authentication_Slice)
     const dispatch = useDispatch()
@@ -50,14 +58,24 @@ export default function AuthenticationPage() {
         password: string,
         username: string
     }) => {
-        const _data = await dispatch(registerApiHandle({
-            email: data.email,
-            password: data.password,
-            username: data.username
-        }) as any)
-        if (_data.payload?.token) {
-            profileContext?.StartApp()
-            router.replace('/')
+        try {
+            const _data = await dispatch(registerApiHandle({
+                email: data.email,
+                password: data.password,
+                username: data.username
+            }) as any)
+            if (_data.payload?.token) {
+                profileContext?.StartApp()
+                signIn("credentials", {
+                    email: _data.payload.email,
+                    name: _data.payload.name,
+                    id: _data.payload.id,
+                    image: _data.payload.image,
+                    redirect: false,
+                });
+            }
+        } catch (error) {
+            console.log(error)
         }
     }, [])
 
